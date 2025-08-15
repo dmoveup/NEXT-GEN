@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Digital Move Up - Next-Gen Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              'space-grotesk': ['"Space Grotesk"', 'sans-serif'],
+            },
+            colors: {
+              'brand-cyan': '#00F0FF',
+              'brand-purple': '#A349E4',
+              'brand-bg': '#0A0A0A',
+            },
+            animation: {
+              'text-gradient': 'text-gradient 3s linear infinite',
+            },
+            keyframes: {
+              'text-gradient': {
+                'to': {
+                  'backgroundPosition': '200% center',
+                },
+              },
+            },
+          }
+        }
+      }
+    </script>
+    <style>
+      /* Custom scrollbar for a modern look */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #1a1a1a;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #444;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+      }
+
+      /* Global styles for the scroll-snap container */
+      .scroll-container {
+        scroll-snap-type: y mandatory;
+        overflow-y: scroll;
+        height: 100vh;
+      }
+      .scroll-section {
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.1.1/",
+    "react": "https://esm.sh/react@^19.1.1",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.1/",
+    "framer-motion": "https://esm.sh/framer-motion@^11.3.11",
+    "react-lottie-player": "https://esm.sh/react-lottie-player@^2.0.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-brand-bg text-gray-200 font-space-grotesk antialiased">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
