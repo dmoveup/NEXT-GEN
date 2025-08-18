@@ -6,14 +6,17 @@ import Lottie from 'react-lottie-player';
 //================================================================================
 // 0. MOCK LOTTIE ANIMATION DATA
 //================================================================================
-const aiBrainLottie = "https://assets4.lottiefiles.com/packages/lf20_S18zHeoSG5.json";
+// FIX: Use local path for Lottie animation JSON
+const aiBrainLottie = "/assets/lottie/ai-brain.json";
 
 
 //================================================================================
 // 1. TYPE DEFINITIONS & MOCK DATA
 //================================================================================
 type SectionId = 'hero' | 'services' | 'portfolio' | 'process' | 'about' | 'testimonials' | 'contact';
-type PortfolioTab = 'websites' | 'ai-videos' | 'branding' | 'photography';
+// FIX: Updated PortfolioTab type for new structure
+type PortfolioTab = 'websites' | 'video' | 'branding' | 'photography';
+type VideoCategory = 'ecommerce' | 'cinematic' | 'ai';
 
 
 const MOCK_DATA = {
@@ -26,16 +29,20 @@ const MOCK_DATA = {
         { title: "Consulting", description: "Conseils stratégiques pour aligner vos actions marketing avec vos objectifs business." },
     ],
     portfolio: {
-        aiVideos: [
-            { id: 'dQw4w9WgXcQ', title: "Analyse Prédictive IA", type: 'Prédictif', thumbnail: 'https://picsum.photos/seed/v1/400/300' },
-            { id: '3tmd-ClpJxA', title: "Campagne Publicitaire Générative", type: 'Génératif', thumbnail: 'https://picsum.photos/seed/v2/400/300' },
-            { id: 'NlsrJbVLi_A', title: "Success Story Client", type: 'Client', thumbnail: 'https://picsum.photos/seed/v3/400/300' },
+        // FIX: Replaced remote placeholder images with local asset paths
+        videos: [
+            { id: 'ecom1', title: "Pub Produit Révolutionnaire", category: 'ecommerce' as VideoCategory, thumbnail: '/assets/portfolio/videos/ecom1.jpg' },
+            { id: 'cine1', title: "L'Histoire de la Marque", category: 'cinematic' as VideoCategory, thumbnail: '/assets/portfolio/videos/cine1.jpg' },
+            { id: 'ai1', title: "Visualiseur de Données IA", category: 'ai' as VideoCategory, thumbnail: '/assets/portfolio/videos/ai1.jpg' },
+            { id: 'ecom2', title: "Démo Unboxing", category: 'ecommerce' as VideoCategory, thumbnail: '/assets/portfolio/videos/ecom2.jpg' },
+            { id: 'cine2', title: "Court-métrage 'Origines'", category: 'cinematic' as VideoCategory, thumbnail: '/assets/portfolio/videos/cine2.jpg' },
+            { id: 'ai2', title: "Animation Logo Générative", category: 'ai' as VideoCategory, thumbnail: '/assets/portfolio/videos/ai2.jpg' },
         ],
         photos: [
-            { id: 1, src: `https://picsum.photos/seed/p1/600/800`, title: 'Rêves de Néon', category: 'Événements' },
-            { id: 2, src: `https://picsum.photos/seed/p2/600/400`, title: 'Murmure de la Forêt', category: 'Nature' },
-            { id: 3, src: `https://picsum.photos/seed/p3/600/600`, title: 'Arôme', category: 'Produits' },
-            { id: 4, src: `https://picsum.photos/seed/p4/600/700`, title: 'Le PDG', category: 'Personnes' },
+            { id: 1, src: `/assets/portfolio/photos/photo1.jpg`, title: 'Rêves de Néon', category: 'Événements' },
+            { id: 2, src: `/assets/portfolio/photos/photo2.jpg`, title: 'Murmure de la Forêt', category: 'Nature' },
+            { id: 3, src: `/assets/portfolio/photos/photo3.jpg`, title: 'Arôme', category: 'Produits' },
+            { id: 4, src: `/assets/portfolio/photos/photo4.jpg`, title: 'Le PDG', category: 'Personnes' },
         ],
         brands: [
             { id: 1, name: "Stellar Solutions", logoUrl: "✨", tagline: 'Visez les étoiles.', industry: 'Tech' },
@@ -43,9 +50,9 @@ const MOCK_DATA = {
             { id: 3, name: "Synergy Co", logoUrl: "🤝", tagline: 'Plus forts ensemble.', industry: 'Conseil' },
         ],
         websites: [
-            { id: 1, name: "QuantumLeap", screenshotUrl: "https://picsum.photos/seed/w1/600/400", stack: ['React', 'Node.js', 'Vercel'], client: 'QuantumLeap Inc.', url: '#' },
-            { id: 2, name: "EcoFoods", screenshotUrl: "https://picsum.photos/seed/w2/600/400", stack: ['Shopify', 'Liquid', 'GraphQL'], client: 'EcoFoods Marketplace', url: '#' },
-            { id: 3, name: "Artisan Collective", screenshotUrl: "https://picsum.photos/seed/w3/600/400", stack: ['Webflow', 'Figma', 'Lottie'], client: 'The Artisan Collective', url: '#' },
+            { id: 1, name: "QuantumLeap", screenshotUrl: "/assets/portfolio/websites/quantum-leap.jpg", stack: ['React', 'Node.js', 'Vercel'], client: 'QuantumLeap Inc.', url: '#' },
+            { id: 2, name: "EcoFoods", screenshotUrl: "/assets/portfolio/websites/ecofoods.jpg", stack: ['Shopify', 'Liquid', 'GraphQL'], client: 'EcoFoods Marketplace', url: '#' },
+            { id: 3, name: "Artisan Collective", screenshotUrl: "/assets/portfolio/websites/artisan-collective.jpg", stack: ['Webflow', 'Figma', 'Lottie'], client: 'The Artisan Collective', url: '#' },
         ]
     },
     processSteps: [
@@ -75,40 +82,50 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} v
 const ArrowRightIcon = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>;
 const TrendingUpIcon = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>;
 const MessageSquareIcon = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>;
-const LogoIcon = () => <div className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-cyan to-brand-purple">DMU</div>;
+const LogoIcon = () => <div className="text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-brand-mint to-brand-purple">DMU</div>;
+// FIX: Add Sun and Moon icons for theme toggle
+const SunIcon = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>;
+const MoonIcon = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>;
 
 //================================================================================
 // 3. LAYOUT & NAVIGATION COMPONENTS
 //================================================================================
 const SectionWrapper = React.forwardRef<HTMLElement, { children: React.ReactNode, id: SectionId }>(({ children, id }, ref) => (
-    <section ref={ref} id={id} className="h-screen w-full flex flex-col justify-center items-center p-4 md:p-8 relative scroll-section">
+    // FIX: Adjusted padding to prevent content from being hidden behind fixed nav/dock
+    <section ref={ref} id={id} className="h-screen w-full flex flex-col justify-center items-center p-4 md:p-8 relative scroll-section pt-24 pb-20">
         {children}
     </section>
 ));
 
-const NavbarTop = () => (
+const NavbarTop = ({ theme, toggleTheme }: { theme: string, toggleTheme: () => void }) => (
     <header className="fixed top-0 left-0 right-0 z-50 p-4">
-        <div className="container mx-auto flex justify-between items-center bg-black/30 backdrop-blur-lg p-3 rounded-2xl border border-white/10">
+        <div className="container mx-auto flex justify-between items-center bg-white/50 dark:bg-black/30 backdrop-blur-lg p-3 rounded-2xl border border-black/10 dark:border-white/10">
             <a href="#hero" className="flex items-center gap-3">
                 <LogoIcon />
-                <span className="font-bold text-lg hidden sm:block">Digital Move Up</span>
+                <span className="font-extrabold text-lg hidden sm:block">Digital Move Up</span>
             </a>
-            <a href="#contact" className="px-4 py-2 text-sm font-bold bg-gradient-to-r from-brand-cyan to-brand-purple text-black rounded-lg transition-transform hover:scale-105">
-                Parler à un expert
-            </a>
+            <div className="flex items-center gap-4">
+                <a href="#contact" className="px-4 py-2 text-sm font-bold bg-gradient-to-r from-brand-mint to-brand-purple text-black rounded-lg transition-transform hover:scale-105">
+                    Parler à un expert
+                </a>
+                {/* FIX: Add theme toggle button */}
+                <button onClick={toggleTheme} className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-200 dark:bg-white/10 transition-colors">
+                    {theme === 'dark' ? <SunIcon className="w-5 h-5 text-yellow-400" /> : <MoonIcon className="w-5 h-5 text-gray-800" />}
+                </button>
+            </div>
         </div>
     </header>
 );
 
 const Dock = ({ activeSection }: { activeSection: SectionId }) => {
     const mouseX = useMotionValue(Infinity);
+    // FIX: Updated navItems to match user request
     const navItems: { id: SectionId, label: string, icon: React.ComponentType<any> }[] = [
         { id: 'hero', label: 'Accueil', icon: HomeIcon },
         { id: 'services', label: 'Services', icon: LayersIcon },
-        { id: 'portfolio', label: 'Portfolio', icon: CameraIcon },
         { id: 'process', label: 'Processus', icon: TrendingUpIcon },
+        { id: 'portfolio', label: 'Portfolio', icon: CameraIcon },
         { id: 'about', label: 'À Propos', icon: UsersIcon },
-        { id: 'testimonials', label: 'Témoignages', icon: MessageSquareIcon },
         { id: 'contact', label: 'Contact', icon: MailIcon },
     ];
 
@@ -116,7 +133,7 @@ const Dock = ({ activeSection }: { activeSection: SectionId }) => {
         <nav 
             onMouseMove={(e) => mouseX.set(e.nativeEvent.x)}
             onMouseLeave={() => mouseX.set(Infinity)}
-            className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex h-16 items-end gap-2 rounded-2xl bg-black/30 backdrop-blur-lg px-4 pb-3 border border-white/10"
+            className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex h-16 items-end gap-2 rounded-2xl bg-white/50 dark:bg-black/30 backdrop-blur-lg px-4 pb-3 border border-black/10 dark:border-white/10"
         >
             {navItems.map(({ id, label, icon: Icon }) => {
                 const ref = useRef<HTMLAnchorElement>(null);
@@ -130,11 +147,11 @@ const Dock = ({ activeSection }: { activeSection: SectionId }) => {
                     <a href={`#${id}`} key={id} ref={ref} className="group relative">
                         <motion.div
                             style={{ scale }}
-                            className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors duration-300 ${activeSection === id ? 'bg-brand-cyan text-black' : 'bg-white/10 text-white hover:bg-white/20'}`}
+                            className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors duration-300 ${activeSection === id ? 'bg-brand-mint text-black' : 'bg-gray-200 dark:bg-white/10 text-brand-text-light dark:text-white hover:bg-gray-300 dark:hover:bg-white/20'}`}
                         >
                             <Icon className="w-5 h-5" />
                         </motion.div>
-                        <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block px-2 py-1 text-xs bg-black/80 rounded-md whitespace-nowrap">
+                        <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block px-2 py-1 text-xs bg-black/80 text-white rounded-md whitespace-nowrap">
                             {label}
                         </div>
                     </a>
@@ -153,7 +170,8 @@ const FloatingButtons = () => (
 );
 
 const SectionTitle = ({ children }: { children: React.ReactNode }) => (
-    <h2 className="text-3xl md:text-5xl font-bold text-center mb-4 md:mb-12 absolute top-20 md:top-24 left-1/2 -translate-x-1/2 w-full px-4">
+    // FIX: Removed absolute positioning to fix layout overlaps. Now part of the document flow.
+    <h2 className="text-[32px] md:text-[40px] font-extrabold text-center mb-8 md:mb-12 w-full px-4">
         {children}
     </h2>
 );
@@ -166,21 +184,21 @@ const SectionTitle = ({ children }: { children: React.ReactNode }) => (
 // 4.1. Hero Section
 const HeroSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
     <SectionWrapper ref={ref} id="hero">
-        <div className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20" style={{ backgroundImage: `url('https://picsum.photos/seed/bg/1920/1080')` }} />
-        <div className="absolute inset-0 bg-gradient-to-t from-brand-bg via-brand-bg/80 to-transparent" />
+        <div className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-10 dark:opacity-20" style={{ backgroundImage: `url('/assets/hero-background.jpg')` }} />
+        <div className="absolute inset-0 bg-gradient-to-t from-brand-bg-light dark:from-brand-bg-dark via-brand-bg-light/80 dark:via-brand-bg-dark/80 to-transparent" />
         <div className="relative text-center z-10">
             <motion.h1 
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-                className="text-4xl md:text-7xl font-bold mb-4"
+                className="text-[44px] md:text-[56px] font-black leading-tight mb-4"
             >
-                <span className="text-gray-300">Votre marketing. </span><br className="md:hidden" />
-                <span className="bg-gradient-to-r from-brand-cyan to-brand-purple bg-clip-text text-transparent animate-text-gradient bg-[200%_auto]">
+                <span className="text-gray-700 dark:text-gray-300">Votre marketing. </span><br className="md:hidden" />
+                <span className="bg-gradient-to-r from-brand-mint to-brand-purple bg-clip-text text-transparent animate-text-gradient bg-[200%_auto]">
                     Plus intelligent.
                 </span>
             </motion.h1>
             <motion.p 
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}
-                className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-8"
+                className="text-base md:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-8"
             >
                 Nous fusionnons la créativité avec la précision de l'IA pour booster votre croissance.
             </motion.p>
@@ -188,8 +206,8 @@ const HeroSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.4 }}
                 className="flex justify-center items-center gap-4"
             >
-                <a href="#contact" className="px-6 py-3 font-bold bg-white text-black rounded-lg transition-transform hover:scale-105">Parler à un expert</a>
-                <a href="#portfolio" className="px-6 py-3 font-bold text-white bg-white/10 border border-white/20 rounded-lg transition-colors hover:bg-white/20">Voir nos travaux ↓</a>
+                <a href="#contact" className="px-6 py-3 font-bold bg-brand-text-light dark:bg-white text-brand-bg-light dark:text-black rounded-lg transition-transform hover:scale-105">Parler à un expert</a>
+                <a href="#portfolio" className="px-6 py-3 font-bold text-brand-text-light dark:text-white bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/20 rounded-lg transition-colors hover:bg-black/10 dark:hover:bg-white/20">Voir nos travaux ↓</a>
             </motion.div>
         </div>
     </SectionWrapper>
@@ -198,8 +216,9 @@ const HeroSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
 // 4.2. Services Section
 const ServicesSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
     <SectionWrapper ref={ref} id="services">
-        <SectionTitle>Nos <span className="text-brand-cyan">Services</span></SectionTitle>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl w-full">
+        <SectionTitle>Nos <span className="text-brand-mint">Services</span></SectionTitle>
+        {/* FIX: Removed large top margin, layout now handled by SectionTitle */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl w-full max-h-[70vh] overflow-y-auto p-4">
             {MOCK_DATA.services.map((service, index) => (
                 <motion.div
                     key={service.title}
@@ -207,10 +226,10 @@ const ServicesSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                     viewport={{ once: true, amount: 0.5 }}
-                    className="bg-white/5 p-6 rounded-xl border border-white/10 hover:border-brand-cyan/50 transition-colors"
+                    className="bg-gray-50/50 dark:bg-white/5 p-6 rounded-xl border border-black/10 dark:border-white/10 hover:border-brand-mint/50 transition-colors"
                 >
-                    <h3 className="font-bold text-xl mb-2 text-brand-cyan">{service.title}</h3>
-                    <p className="text-gray-400">{service.description}</p>
+                    <h3 className="font-bold text-[22px] md:text-[28px] mb-2 text-brand-mint">{service.title}</h3>
+                    <p className="text-gray-600 dark:text-gray-400 text-base md:text-lg">{service.description}</p>
                 </motion.div>
             ))}
         </div>
@@ -220,42 +239,71 @@ const ServicesSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
 // 4.3. Portfolio Section
 const PortfolioSection = React.forwardRef<HTMLElement, {}>((props, ref) => {
     const [activeTab, setActiveTab] = useState<PortfolioTab>('websites');
+    // FIX: State for video sub-category filtering
+    const [videoCategory, setVideoCategory] = useState<VideoCategory>('ecommerce');
+
     const tabs: {id: PortfolioTab, label: string, icon: React.ComponentType<any>}[] = [
         { id: 'websites', label: 'Sites Web', icon: GlobeIcon },
-        { id: 'ai-videos', label: 'Vidéos IA', icon: VideoIcon },
+        // FIX: Renamed 'ai-videos' to 'video'
+        { id: 'video', label: 'Vidéo', icon: VideoIcon },
         { id: 'branding', label: 'Branding', icon: LayersIcon },
         { id: 'photography', label: 'Photo', icon: CameraIcon },
+    ];
+
+    const videoCategories: {id: VideoCategory, label: string}[] = [
+        { id: 'ecommerce', label: 'E-commerce' },
+        { id: 'cinematic', label: 'Cinematic' },
+        { id: 'ai', label: 'AI' },
     ];
 
     return (
         <SectionWrapper ref={ref} id="portfolio">
             <SectionTitle>Voir nos <span className="text-brand-purple">travaux</span></SectionTitle>
-            <div className="w-full max-w-7xl h-[80vh] flex flex-col">
-                <div className="flex justify-center gap-2 md:gap-4 mb-8">
+            <div className="w-full max-w-7xl max-h-[75vh] flex flex-col">
+                <div className="flex justify-center gap-2 md:gap-4 mb-4">
                     {tabs.map(tab => (
-                        <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`px-4 py-2 text-sm rounded-lg border transition-colors flex items-center gap-2 ${activeTab === tab.id ? 'bg-brand-purple text-black border-brand-purple' : 'border-white/20 bg-white/5 hover:bg-white/10'}`}>
+                        <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`px-4 py-2 text-sm font-bold rounded-lg border transition-colors flex items-center gap-2 ${activeTab === tab.id ? 'bg-brand-purple text-white border-brand-purple' : 'border-black/10 dark:border-white/20 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10'}`}>
                             <tab.icon className="w-4 h-4" />
                             <span className="hidden sm:inline">{tab.label}</span>
                         </button>
                     ))}
                 </div>
+
+                {/* FIX: Render video sub-category filters when 'video' tab is active */}
+                <AnimatePresence>
+                    {activeTab === 'video' && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="flex justify-center gap-2 md:gap-3 mb-6"
+                        >
+                            {videoCategories.map(cat => (
+                                <button key={cat.id} onClick={() => setVideoCategory(cat.id)} className={`px-3 py-1 text-xs font-bold rounded-full transition-colors ${videoCategory === cat.id ? 'bg-brand-mint text-black' : 'bg-gray-200 dark:bg-white/10 hover:bg-gray-300 dark:hover:bg-white/20'}`}>
+                                    {cat.label}
+                                </button>
+                            ))}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
                 <div className="flex-grow relative">
                     <AnimatePresence mode="wait">
                         <motion.div
-                            key={activeTab}
+                            key={`${activeTab}-${videoCategory}`}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -20 }}
                             transition={{ duration: 0.3 }}
-                            className="w-full h-full overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+                            className="w-full h-full overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden p-2"
                         >
                             {activeTab === 'websites' && (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     {MOCK_DATA.portfolio.websites.map(site => (
-                                        <a href={site.url} target="_blank" rel="noopener noreferrer" key={site.id} className="group bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-brand-purple/50 transition-colors p-4">
-                                            <img src={site.screenshotUrl} alt={site.name} className="w-full aspect-video object-cover rounded-md mb-4 border border-white/10" />
-                                            <h3 className="text-xl font-bold">{site.name}</h3>
-                                            <p className="text-gray-400 text-sm mb-2">{site.client}</p>
+                                        <a href={site.url} target="_blank" rel="noopener noreferrer" key={site.id} className="group bg-gray-50/50 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl overflow-hidden hover:border-brand-purple/50 transition-colors p-4">
+                                            <img src={site.screenshotUrl} alt={site.name} className="w-full aspect-video object-cover rounded-md mb-4 border border-black/10 dark:border-white/10" />
+                                            <h3 className="font-bold text-[22px] md:text-[28px]">{site.name}</h3>
+                                            <p className="text-gray-600 dark:text-gray-400 text-[13px] md:text-sm mb-2">{site.client}</p>
                                             <div className="flex items-center gap-2 text-brand-purple font-bold group-hover:underline text-sm">
                                                 Visiter le Site <ArrowRightIcon className="w-4 h-4" />
                                             </div>
@@ -263,18 +311,17 @@ const PortfolioSection = React.forwardRef<HTMLElement, {}>((props, ref) => {
                                     ))}
                                 </div>
                             )}
-                             {activeTab === 'ai-videos' && (
+                             {activeTab === 'video' && (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                                    {MOCK_DATA.portfolio.aiVideos.map(video => (
-                                        <div key={video.id} className="bg-white/5 p-3 rounded-xl border border-white/10 group cursor-pointer">
+                                    {MOCK_DATA.portfolio.videos.filter(v => v.category === videoCategory).map(video => (
+                                        <div key={video.id} className="bg-gray-50/50 dark:bg-white/5 p-3 rounded-xl border border-black/10 dark:border-white/10 group cursor-pointer">
                                             <div className="aspect-video rounded-lg overflow-hidden mb-3 relative">
                                                 <img src={video.thumbnail} alt={video.title} className="w-full h-full object-cover"/>
                                                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                                     <VideoIcon className="w-12 h-12 text-white" />
                                                 </div>
                                             </div>
-                                            <h3 className="font-bold">{video.title}</h3>
-                                            <p className="text-sm text-gray-400">{video.type}</p>
+                                            <h3 className="font-bold text-base md:text-lg">{video.title}</h3>
                                         </div>
                                     ))}
                                 </div>
@@ -282,10 +329,10 @@ const PortfolioSection = React.forwardRef<HTMLElement, {}>((props, ref) => {
                             {activeTab === 'branding' && (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                                     {MOCK_DATA.portfolio.brands.map(brand => (
-                                        <div key={brand.id} className="bg-white/5 border border-white/10 rounded-xl p-6 flex flex-col justify-center items-center text-center aspect-square">
+                                        <div key={brand.id} className="bg-gray-50/50 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-6 flex flex-col justify-center items-center text-center aspect-square">
                                             <div className="text-6xl mb-4">{brand.logoUrl}</div>
-                                            <h3 className="text-2xl font-bold">{brand.name}</h3>
-                                            <p className="text-gray-400 italic">"{brand.tagline}"</p>
+                                            <h3 className="font-bold text-[22px] md:text-[28px]">{brand.name}</h3>
+                                            <p className="text-gray-600 dark:text-gray-400 italic text-base md:text-lg">"{brand.tagline}"</p>
                                         </div>
                                     ))}
                                 </div>
@@ -296,7 +343,7 @@ const PortfolioSection = React.forwardRef<HTMLElement, {}>((props, ref) => {
                                         <div key={photo.id} className="mb-4 break-inside-avoid group relative overflow-hidden rounded-lg">
                                             <img src={photo.src} alt={photo.title} className="w-full h-auto rounded-lg" />
                                             <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                                                <h3 className="text-white font-bold">{photo.title}</h3>
+                                                <h3 className="text-white font-bold text-base md:text-lg">{photo.title}</h3>
                                             </div>
                                         </div>
                                     ))}
@@ -313,7 +360,7 @@ const PortfolioSection = React.forwardRef<HTMLElement, {}>((props, ref) => {
 // 4.4. Process Section
 const ProcessSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
     <SectionWrapper ref={ref} id="process">
-        <SectionTitle>Notre <span className="text-brand-cyan">Méthodologie</span></SectionTitle>
+        <SectionTitle>Notre <span className="text-brand-mint">Méthodologie</span></SectionTitle>
         <div className="w-full max-w-5xl space-y-8">
             {MOCK_DATA.processSteps.map((step, index) => (
                  <motion.div
@@ -324,12 +371,12 @@ const ProcessSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
                     viewport={{ once: true, amount: 0.6 }}
                     className="flex items-center gap-6"
                 >
-                    <div className="flex-shrink-0 w-16 h-16 bg-white/5 border-2 border-brand-cyan rounded-full flex items-center justify-center">
-                        <span className="text-2xl font-bold text-brand-cyan">{`0${step.number}`}</span>
+                    <div className="flex-shrink-0 w-16 h-16 bg-gray-100 dark:bg-white/5 border-2 border-brand-mint rounded-full flex items-center justify-center">
+                        <span className="text-2xl font-extrabold text-brand-mint">{`0${step.number}`}</span>
                     </div>
                     <div>
-                        <h3 className="text-xl font-bold text-white mb-1">{step.title}</h3>
-                        <p className="text-gray-400">{step.description}</p>
+                        <h3 className="font-bold text-[22px] md:text-[28px] text-brand-text-light dark:text-white mb-1">{step.title}</h3>
+                        <p className="text-gray-600 dark:text-gray-400 text-base md:text-lg">{step.description}</p>
                     </div>
                 </motion.div>
             ))}
@@ -343,12 +390,12 @@ const AboutSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
         <SectionTitle>Pourquoi <span className="text-brand-purple">Digital Move Up</span></SectionTitle>
         <div className="grid md:grid-cols-2 gap-8 w-full max-w-5xl items-center">
             <div className="text-center md:text-left">
-                <h3 className="text-3xl font-bold mb-4">Notre Mission</h3>
-                <p className="text-gray-300 mb-6">Nous fusionnons passion créative et précision de l'IA pour aider les marques à naviguer dans le paysage numérique et à atteindre une croissance exponentielle.</p>
-                <h4 className="font-bold text-xl mb-3">Nos Valeurs:</h4>
+                <h3 className="text-[28px] font-extrabold mb-4">Notre Mission</h3>
+                <p className="text-gray-700 dark:text-gray-300 mb-6 text-base md:text-lg">Nous fusionnons passion créative et précision de l'IA pour aider les marques à naviguer dans le paysage numérique et à atteindre une croissance exponentielle.</p>
+                <h4 className="font-extrabold text-xl mb-3">Nos Valeurs:</h4>
                 <div className="flex flex-wrap gap-2 justify-center md:justify-start">
                     {['Innovation', 'Transparence', 'Performance', 'Partenariat'].map(tech => (
-                         <span key={tech} className="text-sm bg-white/10 px-3 py-1 rounded-full">{tech}</span>
+                         <span key={tech} className="text-sm font-medium bg-gray-200 dark:bg-white/10 px-3 py-1 rounded-full">{tech}</span>
                     ))}
                 </div>
             </div>
@@ -359,7 +406,7 @@ const AboutSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
                     play
                     style={{ width: '100%', maxWidth: 300, height: 'auto' }}
                 />
-                <p className="text-gray-400 mt-2 text-center">Propulsé par Imed, notre noyau IA.</p>
+                <p className="text-gray-600 dark:text-gray-400 mt-2 text-center text-[13px] md:text-sm">Propulsé par Imed, notre noyau IA.</p>
             </div>
         </div>
     </SectionWrapper>
@@ -368,16 +415,16 @@ const AboutSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
 // 4.6. Testimonials Section
 const TestimonialsSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
     <SectionWrapper ref={ref} id="testimonials">
-        <SectionTitle>Nos <span className="text-brand-cyan">Clients</span></SectionTitle>
+        <SectionTitle>Nos <span className="text-brand-mint">Clients</span></SectionTitle>
         <div className="w-full max-w-7xl flex items-center gap-8 overflow-x-auto snap-x snap-mandatory py-8 px-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             {MOCK_DATA.testimonials.map(testimonial => (
-                <div key={testimonial.author} className="snap-center flex-shrink-0 w-[90vw] md:w-[450px] bg-white/5 border border-white/10 rounded-2xl p-8 flex flex-col justify-center backdrop-blur-sm">
-                    <p className="text-lg italic mb-6">"{testimonial.quote}"</p>
+                <div key={testimonial.author} className="snap-center flex-shrink-0 w-[90vw] md:w-[450px] bg-gray-50/50 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl p-8 flex flex-col justify-center backdrop-blur-sm">
+                    <p className="text-base md:text-lg italic mb-6">"{testimonial.quote}"</p>
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-2xl">{testimonial.logo}</div>
+                        <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-white/10 flex items-center justify-center text-2xl">{testimonial.logo}</div>
                         <div>
-                            <p className="font-bold text-white">{testimonial.author}</p>
-                            <p className="text-sm text-gray-400">{testimonial.company}</p>
+                            <p className="font-bold text-brand-text-light dark:text-white">{testimonial.author}</p>
+                            <p className="text-[13px] md:text-sm text-gray-600 dark:text-gray-400">{testimonial.company}</p>
                         </div>
                     </div>
                 </div>
@@ -390,15 +437,15 @@ const TestimonialsSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
 const ContactSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
     <SectionWrapper ref={ref} id="contact">
         <SectionTitle>Parlons de votre <span className="text-brand-purple">projet</span></SectionTitle>
-        <div className="w-full max-w-md bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-sm">
+        <div className="w-full max-w-md bg-gray-50/50 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl p-8 backdrop-blur-sm">
             <form className="space-y-4">
-                <input type="text" placeholder="Votre Nom" className="w-full bg-white/5 p-3 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
-                <input type="email" placeholder="Votre Email" className="w-full bg-white/5 p-3 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
-                <textarea placeholder="Votre Message" rows={4} className="w-full bg-white/5 p-3 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-brand-purple"></textarea>
-                <button type="submit" className="w-full p-3 font-bold bg-gradient-to-r from-brand-cyan to-brand-purple text-black rounded-lg transition-transform hover:scale-105">Envoyer le Message</button>
+                <input type="text" placeholder="Votre Nom" className="w-full bg-gray-100 dark:bg-white/5 p-3 rounded-lg border border-black/10 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                <input type="email" placeholder="Votre Email" className="w-full bg-gray-100 dark:bg-white/5 p-3 rounded-lg border border-black/10 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
+                <textarea placeholder="Votre Message" rows={4} className="w-full bg-gray-100 dark:bg-white/5 p-3 rounded-lg border border-black/10 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-brand-purple"></textarea>
+                <button type="submit" className="w-full p-3 font-bold bg-gradient-to-r from-brand-mint to-brand-purple text-black rounded-lg transition-transform hover:scale-105">Envoyer le Message</button>
             </form>
-            <div className="text-center my-4 text-gray-400">OU</div>
-            <a href="https://calendly.com/" target="_blank" rel="noopener noreferrer" className="block w-full text-center p-3 font-bold bg-white/10 border border-white/20 text-white rounded-lg transition-colors hover:bg-white/20">
+            <div className="text-center my-4 text-gray-500 dark:text-gray-400">OU</div>
+            <a href="https://calendly.com/" target="_blank" rel="noopener noreferrer" className="block w-full text-center p-3 font-bold bg-gray-200 dark:bg-white/10 border border-black/10 dark:border-white/20 text-brand-text-light dark:text-white rounded-lg transition-colors hover:bg-gray-300 dark:hover:bg-white/20">
                 Réserver un appel sur Calendly
             </a>
         </div>
@@ -410,6 +457,28 @@ const ContactSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
 //================================================================================
 export default function App() {
     const [activeSection, setActiveSection] = useState<SectionId>('hero');
+    // FIX: Add theme state and toggle logic
+    const [theme, setTheme] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('theme') || 'light';
+        }
+        return 'light';
+    });
+    
+    useEffect(() => {
+        const root = window.document.documentElement;
+        if (theme === 'dark') {
+            root.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            root.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+        }
+    }, [theme]);
+
+    const toggleTheme = () => {
+        setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
+    };
     
     const sectionIds: SectionId[] = ['hero', 'services', 'portfolio', 'process', 'about', 'testimonials', 'contact'];
     
@@ -443,8 +512,8 @@ export default function App() {
 
     return (
         <>
-            <NavbarTop />
-            <main className="scroll-container">
+            <NavbarTop theme={theme} toggleTheme={toggleTheme} />
+            <main>
                 <HeroSection ref={refs.hero} />
                 <ServicesSection ref={refs.services} />
                 <PortfolioSection ref={refs.portfolio} />

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-container">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,18 +7,33 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tektur:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script>
+      // FIX: Initialize theme from localStorage before page renders to prevent FOUC
+      if (localStorage.getItem('theme') === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+
       tailwind.config = {
+        // FIX: Enable class-based dark mode
+        darkMode: 'class',
         theme: {
           extend: {
             fontFamily: {
-              'space-grotesk': ['"Space Grotesk"', 'sans-serif'],
+              'tektur': ['"Tektur"', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Arial', 'sans-serif'],
             },
             colors: {
-              'brand-cyan': '#00F0FF',
-              'brand-purple': '#A349E4',
-              'brand-bg': '#0A0A0A',
+              'brand-purple': '#5A1275',
+              'brand-mint': '#00C3A3',
+              'brand-gold': '#FFC107',
+              'brand-ivory': '#F2F2F2',
+              // FIX: Define theme-aware colors
+              'brand-bg-light': '#FFFFFF',
+              'brand-bg-dark': '#0A0A0A',
+              'brand-text-light': '#1F2937', // gray-800
+              'brand-text-dark': '#E5E7EB', // gray-200
             },
             animation: {
               'text-gradient': 'text-gradient 3s linear infinite',
@@ -40,13 +55,22 @@
         width: 8px;
       }
       ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      .dark ::-webkit-scrollbar-track {
         background: #1a1a1a;
       }
       ::-webkit-scrollbar-thumb {
-        background: #444;
+        background: #ccc;
         border-radius: 4px;
       }
+      .dark ::-webkit-scrollbar-thumb {
+        background: #444;
+      }
       ::-webkit-scrollbar-thumb:hover {
+        background: #aaa;
+      }
+      .dark ::-webkit-scrollbar-thumb:hover {
         background: #555;
       }
 
@@ -55,6 +79,7 @@
         scroll-snap-type: y mandatory;
         overflow-y: scroll;
         height: 100vh;
+        scroll-behavior: smooth;
       }
       .scroll-section {
         scroll-snap-align: start;
@@ -89,7 +114,7 @@
     }
 </script>
 </head>
-  <body class="bg-brand-bg text-gray-200 font-space-grotesk antialiased">
+  <body class="bg-brand-bg-light dark:bg-brand-bg-dark text-brand-text-light dark:text-brand-text-dark font-tektur antialiased transition-colors duration-300">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>
