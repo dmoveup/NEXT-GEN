@@ -12,7 +12,7 @@ const aiBrainLottie = "https://assets4.lottiefiles.com/packages/lf20_S18zHeoSG5.
 //================================================================================
 // 1. TYPE DEFINITIONS & MOCK DATA
 //================================================================================
-type SectionId = 'hero' | 'services' | 'portfolio' | 'process' | 'about' | 'testimonials' | 'contact';
+type SectionId = 'hero' | 'services' | 'portfolio' | 'process' | 'about' | 'testimonials' | 'contact' | 'footer';
 type PortfolioTab = 'websites' | 'ai-videos' | 'branding' | 'photography';
 
 
@@ -80,20 +80,32 @@ const LogoIcon = () => <div className="text-2xl font-bold bg-clip-text text-tran
 //================================================================================
 // 3. LAYOUT & NAVIGATION COMPONENTS
 //================================================================================
-const SectionWrapper = React.forwardRef<HTMLElement, { children: React.ReactNode, id: SectionId }>(({ children, id }, ref) => (
-    <section ref={ref} id={id} className="h-screen w-full flex flex-col justify-center items-center p-4 md:p-8 relative scroll-section">
+const SectionWrapper = React.forwardRef<HTMLElement, { children: React.ReactNode, id: SectionId, withTitle?: boolean }>(({ children, id, withTitle = false }, ref) => (
+    <section ref={ref} id={id} className={`h-screen w-full flex flex-col justify-center items-center p-4 md:p-8 ${withTitle ? 'pt-28 md:pt-36' : ''} pb-24 relative scroll-section`}>
         {children}
     </section>
 ));
 
+const handleHashLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const href = e.currentTarget.getAttribute('href') || '';
+    if (href.startsWith('#')) {
+        e.preventDefault();
+        const id = href.slice(1);
+        const el = document.getElementById(id);
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+};
+
 const NavbarTop = () => (
     <header className="fixed top-0 left-0 right-0 z-50 p-4">
         <div className="container mx-auto flex justify-between items-center bg-black/30 backdrop-blur-lg p-3 rounded-2xl border border-white/10">
-            <a href="#hero" className="flex items-center gap-3">
+            <a href="#hero" onClick={handleHashLinkClick} className="flex items-center gap-3">
                 <LogoIcon />
                 <span className="font-bold text-lg hidden sm:block">Digital Move Up</span>
             </a>
-            <a href="#contact" className="px-4 py-2 text-sm font-bold bg-gradient-to-r from-brand-cyan to-brand-purple text-black rounded-lg transition-transform hover:scale-105">
+            <a href="#contact" onClick={handleHashLinkClick} className="px-4 py-2 text-sm font-bold bg-gradient-to-r from-brand-cyan to-brand-purple text-black rounded-lg transition-transform hover:scale-105">
                 Parler à un expert
             </a>
         </div>
@@ -103,13 +115,13 @@ const NavbarTop = () => (
 const Dock = ({ activeSection }: { activeSection: SectionId }) => {
     const mouseX = useMotionValue(Infinity);
     const navItems: { id: SectionId, label: string, icon: React.ComponentType<any> }[] = [
-        { id: 'hero', label: 'Accueil', icon: HomeIcon },
-        { id: 'services', label: 'Services', icon: LayersIcon },
-        { id: 'portfolio', label: 'Portfolio', icon: CameraIcon },
-        { id: 'process', label: 'Processus', icon: TrendingUpIcon },
-        { id: 'about', label: 'À Propos', icon: UsersIcon },
-        { id: 'testimonials', label: 'Témoignages', icon: MessageSquareIcon },
-        { id: 'contact', label: 'Contact', icon: MailIcon },
+        { id: 'hero', label: 'Accueil', icon: HomeIcon }, // 🏠 Home → Hero
+        { id: 'services', label: 'Services', icon: LayersIcon }, // 📑 Services → Nos Services
+        { id: 'process', label: 'Méthodologie', icon: TrendingUpIcon }, // 📈 Process → Notre Méthodologie
+        { id: 'portfolio', label: 'Travaux', icon: CameraIcon }, // 🖼️ Portfolio → Voir nos travaux
+        { id: 'about', label: 'À Propos', icon: UsersIcon }, // 👥 About → Team
+        { id: 'contact', label: 'Contact', icon: MessageSquareIcon }, // 💬 Chat/Contact → Contactez-nous
+        { id: 'footer', label: 'Email', icon: MailIcon }, // ✉️ Mail → Footer/Contact form
     ];
 
     return (
@@ -127,7 +139,7 @@ const Dock = ({ activeSection }: { activeSection: SectionId }) => {
                 const scale = useTransform(distance, [-150, 0, 150], [1, 1.5, 1], { clamp: true });
 
                 return (
-                    <a href={`#${id}`} key={id} ref={ref} className="group relative">
+                    <a href={`#${id}`} onClick={handleHashLinkClick} key={id} ref={ref} className="group relative">
                         <motion.div
                             style={{ scale }}
                             className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors duration-300 ${activeSection === id ? 'bg-brand-cyan text-black' : 'bg-white/10 text-white hover:bg-white/20'}`}
@@ -153,7 +165,7 @@ const FloatingButtons = () => (
 );
 
 const SectionTitle = ({ children }: { children: React.ReactNode }) => (
-    <h2 className="text-3xl md:text-5xl font-bold text-center mb-4 md:mb-12 absolute top-20 md:top-24 left-1/2 -translate-x-1/2 w-full px-4">
+    <h2 className="text-3xl md:text-5xl font-bold text-center mb-6 md:mb-12 absolute top-16 md:top-24 left-1/2 -translate-x-1/2 w-full px-4">
         {children}
     </h2>
 );
@@ -188,8 +200,8 @@ const HeroSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.4 }}
                 className="flex justify-center items-center gap-4"
             >
-                <a href="#contact" className="px-6 py-3 font-bold bg-white text-black rounded-lg transition-transform hover:scale-105">Parler à un expert</a>
-                <a href="#portfolio" className="px-6 py-3 font-bold text-white bg-white/10 border border-white/20 rounded-lg transition-colors hover:bg-white/20">Voir nos travaux ↓</a>
+                <a href="#contact" onClick={handleHashLinkClick} className="px-6 py-3 font-bold bg-white text-black rounded-lg transition-transform hover:scale-105">Parler à un expert</a>
+                <a href="#portfolio" onClick={handleHashLinkClick} className="px-6 py-3 font-bold text-white bg-white/10 border border-white/20 rounded-lg transition-colors hover:bg-white/20">Voir nos travaux ↓</a>
             </motion.div>
         </div>
     </SectionWrapper>
@@ -197,7 +209,7 @@ const HeroSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
 
 // 4.2. Services Section
 const ServicesSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
-    <SectionWrapper ref={ref} id="services">
+    <SectionWrapper ref={ref} id="services" withTitle>
         <SectionTitle>Nos <span className="text-brand-cyan">Services</span></SectionTitle>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl w-full">
             {MOCK_DATA.services.map((service, index) => (
@@ -228,7 +240,7 @@ const PortfolioSection = React.forwardRef<HTMLElement, {}>((props, ref) => {
     ];
 
     return (
-        <SectionWrapper ref={ref} id="portfolio">
+        <SectionWrapper ref={ref} id="portfolio" withTitle>
             <SectionTitle>Voir nos <span className="text-brand-purple">travaux</span></SectionTitle>
             <div className="w-full max-w-7xl h-[80vh] flex flex-col">
                 <div className="flex justify-center gap-2 md:gap-4 mb-8">
@@ -312,7 +324,7 @@ const PortfolioSection = React.forwardRef<HTMLElement, {}>((props, ref) => {
 
 // 4.4. Process Section
 const ProcessSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
-    <SectionWrapper ref={ref} id="process">
+    <SectionWrapper ref={ref} id="process" withTitle>
         <SectionTitle>Notre <span className="text-brand-cyan">Méthodologie</span></SectionTitle>
         <div className="w-full max-w-5xl space-y-8">
             {MOCK_DATA.processSteps.map((step, index) => (
@@ -339,7 +351,7 @@ const ProcessSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
 
 // 4.5. About Section
 const AboutSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
-    <SectionWrapper ref={ref} id="about">
+    <SectionWrapper ref={ref} id="about" withTitle>
         <SectionTitle>Pourquoi <span className="text-brand-purple">Digital Move Up</span></SectionTitle>
         <div className="grid md:grid-cols-2 gap-8 w-full max-w-5xl items-center">
             <div className="text-center md:text-left">
@@ -367,7 +379,7 @@ const AboutSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
 
 // 4.6. Testimonials Section
 const TestimonialsSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
-    <SectionWrapper ref={ref} id="testimonials">
+    <SectionWrapper ref={ref} id="testimonials" withTitle>
         <SectionTitle>Nos <span className="text-brand-cyan">Clients</span></SectionTitle>
         <div className="w-full max-w-7xl flex items-center gap-8 overflow-x-auto snap-x snap-mandatory py-8 px-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             {MOCK_DATA.testimonials.map(testimonial => (
@@ -388,7 +400,7 @@ const TestimonialsSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
 
 // 4.7. Contact Section
 const ContactSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
-    <SectionWrapper ref={ref} id="contact">
+    <SectionWrapper ref={ref} id="contact" withTitle>
         <SectionTitle>Parlons de votre <span className="text-brand-purple">projet</span></SectionTitle>
         <div className="w-full max-w-md bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-sm">
             <form className="space-y-4">
@@ -405,13 +417,32 @@ const ContactSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
     </SectionWrapper>
 ));
 
+// 4.8. Footer Section
+const FooterSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
+    <SectionWrapper ref={ref} id="footer" withTitle>
+        <SectionTitle>Restons en <span className="text-brand-cyan">contact</span></SectionTitle>
+        <footer className="w-full max-w-5xl text-center space-y-4">
+            <p className="text-gray-400">contact@digitalmoveup.com</p>
+            <div className="flex justify-center gap-4 text-sm text-gray-500">
+                <a href="#hero" onClick={handleHashLinkClick} className="hover:text-white">Accueil</a>
+                <a href="#services" onClick={handleHashLinkClick} className="hover:text-white">Services</a>
+                <a href="#portfolio" onClick={handleHashLinkClick} className="hover:text-white">Travaux</a>
+                <a href="#process" onClick={handleHashLinkClick} className="hover:text-white">Méthodologie</a>
+                <a href="#about" onClick={handleHashLinkClick} className="hover:text-white">À Propos</a>
+                <a href="#contact" onClick={handleHashLinkClick} className="hover:text-white">Contact</a>
+            </div>
+            <p className="text-xs text-gray-600">© {new Date().getFullYear()} Digital Move Up. Tous droits réservés.</p>
+        </footer>
+    </SectionWrapper>
+));
+
 //================================================================================
 // 5. MAIN APP COMPONENT
 //================================================================================
 export default function App() {
     const [activeSection, setActiveSection] = useState<SectionId>('hero');
     
-    const sectionIds: SectionId[] = ['hero', 'services', 'portfolio', 'process', 'about', 'testimonials', 'contact'];
+    const sectionIds: SectionId[] = ['hero', 'services', 'portfolio', 'process', 'about', 'testimonials', 'contact', 'footer'];
     
     const refs = {
         hero: useRef<HTMLElement>(null),
@@ -421,6 +452,7 @@ export default function App() {
         about: useRef<HTMLElement>(null),
         testimonials: useRef<HTMLElement>(null),
         contact: useRef<HTMLElement>(null),
+        footer: useRef<HTMLElement>(null),
     };
 
     const inViewHooks = {
@@ -431,6 +463,7 @@ export default function App() {
         about: useInView(refs.about, { amount: 0.5 }),
         testimonials: useInView(refs.testimonials, { amount: 0.5 }),
         contact: useInView(refs.contact, { amount: 0.5 }),
+        footer: useInView(refs.footer, { amount: 0.5 }),
     };
 
     useEffect(() => {
@@ -438,7 +471,7 @@ export default function App() {
         if (visibleSections.length > 0) {
             setActiveSection(visibleSections[visibleSections.length - 1]);
         }
-    }, [inViewHooks.hero, inViewHooks.services, inViewHooks.portfolio, inViewHooks.process, inViewHooks.about, inViewHooks.testimonials, inViewHooks.contact]);
+    }, [inViewHooks.hero, inViewHooks.services, inViewHooks.portfolio, inViewHooks.process, inViewHooks.about, inViewHooks.testimonials, inViewHooks.contact, inViewHooks.footer]);
 
 
     return (
@@ -452,6 +485,7 @@ export default function App() {
                 <AboutSection ref={refs.about} />
                 <TestimonialsSection ref={refs.testimonials} />
                 <ContactSection ref={refs.contact} />
+                <FooterSection ref={refs.footer} />
             </main>
             <Dock activeSection={activeSection} />
             <FloatingButtons />
