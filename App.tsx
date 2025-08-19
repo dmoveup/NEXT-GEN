@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, useInView, useMotionValue, AnimatePresence } from 'framer-motion';
 import Lottie from 'react-lottie-player';
-import aiBrainLottieData from './assets/lottie/ai-brain.json';
+import aiBrainLottieData from './src/assets/lottie/ai-brain.json';
 
 //================================================================================
 // 0. MOCK LOTTIE ANIMATION DATA
