@@ -1,27 +1,40 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, useInView, useMotionValue, AnimatePresence } from 'framer-motion';
 import Lottie from 'react-lottie-player';
 import aiBrainLottieData from './src/assets/lottie/ai-brain.json';
 
 //================================================================================
-// 0. MOCK LOTTIE ANIMATION DATA
+// 0. ASSET PATHS ORGANIZATION
 //================================================================================
-
+const ASSET_PATHS = {
+  photos: {
+    events: ['/Photos/event_1.jpg', '/Photos/event_2.jpg'],
+    nature: ['/Photos/nature_1.jpg'],
+    products: ['/Photos/product_1.jpg', '/Photos/product_2.jpg'],
+    people: ['/Photos/people_1.jpg']
+  },
+  videos: {
+    reels: ['/Videos-Reels/reel1.mp4', '/Videos-Reels/reel2.mp4', '/Videos-Reels/reel3.mp4'],
+    ecom: ['/Videos-Reels/ecom1.mp4', '/Videos-Reels/ecom2.mp4'],
+    thumbnails: ['/Videos-Reels/reel1_thumbnail.jpg', '/Videos-Reels/reel2_thumbnail.jpg', '/Videos-Reels/reel3_thumbnail.jpg', '/Videos-Reels/ecom1_thumbnail.jpg', '/Videos-Reels/ecom2_thumbnail.jpg']
+  },
+  aiVideos: {
+    videos: ['/Ai Videos/aivideo1.mp4', '/Ai Videos/aivideo2.mp4', '/Ai Videos/aivideo3.mp4'],
+    thumbnails: ['/Ai Videos/aivideo1_thumbnail.jpg', '/Ai Videos/aivideo2_thumbnail.jpg', '/Ai Videos/aivideo3_thumbnail.jpg']
+  },
+  branding: ['/Branding/stellar-solutions-logo.svg', '/Branding/apex-industries-logo.svg', '/Branding/synergy-co-logo.svg'],
+  clients: ['/Clients/stellar-solutions-logo.png', '/Clients/apex-industries-logo.png', '/Clients/synergy-co-logo.png'],
+  websites: ['/Websites/dashikidesign.jpg', '/Websites/fadistsarl.jpg', '/Websites/gatheron.jpg', '/Websites/cakesrayen.jpg', '/Websites/amennoomen.jpg'],
+  voiceOver: ['/Voice Over/sample1.mp3', '/Voice Over/sample2.mp3'],
+  ads: ['/ADS/ad1.jpg', '/ADS/ad2.jpg', '/ADS/ad3.jpg']
+};
 
 //================================================================================
 // 1. TYPE DEFINITIONS & MOCK DATA
 //================================================================================
-// FIX: Renamed 'testimonials' to 'clients' for clarity and consistency.
 type SectionId = 'hero' | 'services' | 'portfolio' | 'process' | 'about' | 'clients' | 'contact';
 type PortfolioTab = 'websites' | 'video' | 'branding' | 'photography';
 type VideoCategory = 'cinematic' | 'ai' | 'ecom';
-
-
-// NOTE FOR DEVELOPERS:
-// To add new content, simply add a new object to the corresponding array below.
-// Ensure your asset files are placed in the correct folders as specified in the paths.
-// For example, to add a new photo, add a new entry to `portfolio.photos` and place the image file in the `/Photos` folder.
 
 const MOCK_DATA = {
     services: [
@@ -34,40 +47,34 @@ const MOCK_DATA = {
     ],
     portfolio: {
         videos: [
-            // To add a new cinematic video, add an entry here and place files in /Videos-Reels/
-            { id: 'cine1', title: "L'Histoire de la Marque", category: 'cinematic' as VideoCategory, thumbnail: '/Videos-Reels/reel1_thumbnail.jpg', videoUrl: '/Videos-Reels/reel1.mp4' },
-            { id: 'cine2', title: "Court-métrage 'Origines'", category: 'cinematic' as VideoCategory, thumbnail: '/Videos-Reels/reel2_thumbnail.jpg', videoUrl: '/Videos-Reels/reel2.mp4' },
-            { id: 'cine3', title: "Pub Produit Révolutionnaire", category: 'cinematic' as VideoCategory, thumbnail: '/Videos-Reels/reel3_thumbnail.jpg', videoUrl: '/Videos-Reels/reel3.mp4' },
-            // To add a new AI video, add an entry here and place files in /Ai Videos/
-            { id: 'ai1', title: "Visualiseur de Données IA", category: 'ai' as VideoCategory, thumbnail: '/Ai Videos/aivideo1_thumbnail.jpg', videoUrl: '/Ai Videos/aivideo1.mp4' },
-            { id: 'ai2', title: "Animation Logo Générative", category: 'ai' as VideoCategory, thumbnail: '/Ai Videos/aivideo2_thumbnail.jpg', videoUrl: '/Ai Videos/aivideo2.mp4' },
-            { id: 'ai3', title: "Démo Unboxing IA", category: 'ai' as VideoCategory, thumbnail: '/Ai Videos/aivideo3_thumbnail.jpg', videoUrl: '/Ai Videos/aivideo3.mp4' },
-             // To add a new E-commerce video, add an entry here and place files in /Videos-Reels/
-            { id: 'ecom1', title: "Publicité Produit High-Tech", category: 'ecom' as VideoCategory, thumbnail: '/Videos-Reels/ecom1_thumbnail.jpg', videoUrl: '/Videos-Reels/ecom1.mp4' },
-            { id: 'ecom2', title: "Tutoriel Mode & Beauté", category: 'ecom' as VideoCategory, thumbnail: '/Videos-Reels/ecom2_thumbnail.jpg', videoUrl: '/Videos-Reels/ecom2.mp4' },
+            { id: 'cine1', title: "L'Histoire de la Marque", category: 'cinematic' as VideoCategory, thumbnail: ASSET_PATHS.videos.thumbnails[0], videoUrl: ASSET_PATHS.videos.reels[0] },
+            { id: 'cine2', title: "Court-métrage 'Origines'", category: 'cinematic' as VideoCategory, thumbnail: ASSET_PATHS.videos.thumbnails[1], videoUrl: ASSET_PATHS.videos.reels[1] },
+            { id: 'cine3', title: "Pub Produit Révolutionnaire", category: 'cinematic' as VideoCategory, thumbnail: ASSET_PATHS.videos.thumbnails[2], videoUrl: ASSET_PATHS.videos.reels[2] },
+            { id: 'ai1', title: "Visualiseur de Données IA", category: 'ai' as VideoCategory, thumbnail: ASSET_PATHS.aiVideos.thumbnails[0], videoUrl: ASSET_PATHS.aiVideos.videos[0] },
+            { id: 'ai2', title: "Animation Logo Générative", category: 'ai' as VideoCategory, thumbnail: ASSET_PATHS.aiVideos.thumbnails[1], videoUrl: ASSET_PATHS.aiVideos.videos[1] },
+            { id: 'ai3', title: "Démo Unboxing IA", category: 'ai' as VideoCategory, thumbnail: ASSET_PATHS.aiVideos.thumbnails[2], videoUrl: ASSET_PATHS.aiVideos.videos[2] },
+            { id: 'ecom1', title: "Publicité Produit High-Tech", category: 'ecom' as VideoCategory, thumbnail: ASSET_PATHS.videos.thumbnails[3], videoUrl: ASSET_PATHS.videos.ecom[0] },
+            { id: 'ecom2', title: "Tutoriel Mode & Beauté", category: 'ecom' as VideoCategory, thumbnail: ASSET_PATHS.videos.thumbnails[4], videoUrl: ASSET_PATHS.videos.ecom[1] },
         ],
         photos: [
-            // To add a new photo, add an entry here and place the image in /Photos/
-            { id: 1, src: `/Photos/event_1.jpg`, title: 'Rêves de Néon', category: 'Événements' },
-            { id: 2, src: `/Photos/nature_1.jpg`, title: 'Murmure de la Forêt', category: 'Nature' },
-            { id: 3, src: `/Photos/product_1.jpg`, title: 'Arôme', category: 'Produits' },
-            { id: 4, src: `/Photos/people_1.jpg`, title: 'Le PDG', category: 'Personnes' },
-            { id: 5, src: `/Photos/event_2.jpg`, title: 'Conférence Tech', category: 'Événements' },
-            { id: 6, src: `/Photos/product_2.jpg`, title: 'Artisanat Local', category: 'Produits' },
+            { id: 1, src: ASSET_PATHS.photos.events[0], title: 'Rêves de Néon', category: 'Événements' },
+            { id: 2, src: ASSET_PATHS.photos.nature[0], title: 'Murmure de la Forêt', category: 'Nature' },
+            { id: 3, src: ASSET_PATHS.photos.products[0], title: 'Arôme', category: 'Produits' },
+            { id: 4, src: ASSET_PATHS.photos.people[0], title: 'Le PDG', category: 'Personnes' },
+            { id: 5, src: ASSET_PATHS.photos.events[1], title: 'Conférence Tech', category: 'Événements' },
+            { id: 6, src: ASSET_PATHS.photos.products[1], title: 'Artisanat Local', category: 'Produits' },
         ],
         brands: [
-            // To add new branding work, add an entry here and place the logo in /Branding/
-            { id: 1, name: "Stellar Solutions", logoUrl: "/Branding/stellar-solutions-logo.svg", tagline: 'Visez les étoiles.', industry: 'Tech' },
-            { id: 2, name: "Apex Industries", logoUrl: "/Branding/apex-industries-logo.svg", tagline: 'La performance au sommet.', industry: 'Industrie' },
-            { id: 3, name: "Synergy Co", logoUrl: "/Branding/synergy-co-logo.svg", tagline: 'Plus forts ensemble.', industry: 'Conseil' },
+            { id: 1, name: "Stellar Solutions", logoUrl: ASSET_PATHS.branding[0], tagline: 'Visez les étoiles.', industry: 'Tech' },
+            { id: 2, name: "Apex Industries", logoUrl: ASSET_PATHS.branding[1], tagline: 'La performance au sommet.', industry: 'Industrie' },
+            { id: 3, name: "Synergy Co", logoUrl: ASSET_PATHS.branding[2], tagline: 'Plus forts ensemble.', industry: 'Conseil' },
         ],
         websites: [
-            // To add a new website, add an entry here and place a screenshot in /Websites/
-            { id: 1, name: "Dashiki Design", screenshotUrl: "/Websites/dashikidesign.jpg", stack: ['Shopify', 'Liquid', 'Custom JS'], client: 'Dashiki Design', url: 'https://www.dashikidesign.com/' },
-            { id: 2, name: "Fadist Sarl", screenshotUrl: "/Websites/fadistsarl.jpg", stack: ['WordPress', 'Elementor', 'PHP'], client: 'Fadist Sarl', url: 'https://www.fadistsarl.com/' },
-            { id: 3, name: "GatherOn", screenshotUrl: "/Websites/gatheron.jpg", stack: ['React', 'Next.js', 'Tailwind CSS'], client: 'GatherOn', url: 'https://gatheron.ae/' },
-            { id: 4, name: "Cakes Rayen", screenshotUrl: "/Websites/cakesrayen.jpg", stack: ['Wix', 'Velo by Wix'], client: 'Cakes Rayen', url: 'https://www.cakesrayen.com/' },
-            { id: 5, name: "Amen Noomen", screenshotUrl: "/Websites/amennoomen.jpg", stack: ['React', 'Framer Motion', 'Three.js'], client: 'Amen Noomen', url: 'https://amennoomen.com/' },
+            { id: 1, name: "Dashiki Design", screenshotUrl: ASSET_PATHS.websites[0], stack: ['Shopify', 'Liquid', 'Custom JS'], client: 'Dashiki Design', url: 'https://www.dashikidesign.com/' },
+            { id: 2, name: "Fadist Sarl", screenshotUrl: ASSET_PATHS.websites[1], stack: ['WordPress', 'Elementor', 'PHP'], client: 'Fadist Sarl', url: 'https://www.fadistsarl.com/' },
+            { id: 3, name: "GatherOn", screenshotUrl: ASSET_PATHS.websites[2], stack: ['React', 'Next.js', 'Tailwind CSS'], client: 'GatherOn', url: 'https://gatheron.ae/' },
+            { id: 4, name: "Cakes Rayen", screenshotUrl: ASSET_PATHS.websites[3], stack: ['Wix', 'Velo by Wix'], client: 'Cakes Rayen', url: 'https://www.cakesrayen.com/' },
+            { id: 5, name: "Amen Noomen", screenshotUrl: ASSET_PATHS.websites[4], stack: ['React', 'Framer Motion', 'Three.js'], client: 'Amen Noomen', url: 'https://amennoomen.com/' },
         ]
     },
     processSteps: [
@@ -77,10 +84,9 @@ const MOCK_DATA = {
         { number: 4, title: 'Analyse & Optimisation', description: "Nous suivons les KPIs et optimisons en continu pour garantir des performances durables." },
     ],
     testimonials: [
-        // To add a new testimonial, add an entry here and place the client logo in /Clients/
-        { quote: "Une transformation digitale incroyable. Notre ROI a augmenté de 200% en 6 mois.", author: "Alice Martin", company: "Stellar Solutions", logo: "/Clients/stellar-solutions-logo.png" },
-        { quote: "L'équipe de Digital Move Up est réactive, créative et incroyablement efficace.", author: "Julien Dubois", company: "Apex Industries", logo: "/Clients/apex-industries-logo.png" },
-        { quote: "Leur approche basée sur la data a complètement changé notre stratégie marketing.", author: "Chloé Lambert", company: "Synergy Co", logo: "/Clients/synergy-co-logo.png" },
+        { quote: "Une transformation digitale incroyable. Notre ROI a augmenté de 200% en 6 mois.", author: "Alice Martin", company: "Stellar Solutions", logo: ASSET_PATHS.clients[0] },
+        { quote: "L'équipe de Digital Move Up est réactive, créative et incroyablement efficace.", author: "Julien Dubois", company: "Apex Industries", logo: ASSET_PATHS.clients[1] },
+        { quote: "Leur approche basée sur la data a complètement changé notre stratégie marketing.", author: "Chloé Lambert", company: "Synergy Co", logo: ASSET_PATHS.clients[2] },
     ]
 };
 
@@ -105,11 +111,15 @@ const MoonIcon = (props: React.SVGProps<SVGSVGElement>) => <svg {...props} viewB
 //================================================================================
 // 3. LAYOUT & NAVIGATION COMPONENTS
 //================================================================================
-const SectionWrapper = React.forwardRef<HTMLElement, { children: React.ReactNode, id: SectionId }>(({ children, id }, ref) => (
-    // Each section is a full-screen, scroll-snapping container.
-    // They are rendered sequentially in the main App component and do not nest.
-    <section ref={ref} id={id} className="h-screen w-full flex flex-col justify-center items-center p-4 md:p-8 relative scroll-section pt-24 pb-20">
-        {children}
+const SectionWrapper = React.forwardRef<HTMLElement, { children: React.ReactNode, id: SectionId, className?: string }>(({ children, id, className = "" }, ref) => (
+    <section 
+        ref={ref} 
+        id={id} 
+        className={`min-h-screen w-full flex flex-col justify-center items-center scroll-section ${className}`}
+    >
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24 max-w-7xl">
+            {children}
+        </div>
     </section>
 ));
 
@@ -134,7 +144,6 @@ const NavbarTop = ({ theme, toggleTheme }: { theme: string, toggleTheme: () => v
 
 const Dock = ({ activeSection }: { activeSection: SectionId }) => {
     const mouseX = useMotionValue(Infinity);
-    // FIX: Added 'Clients' section and reordered items to match the page's visual flow.
     const navItems: { id: SectionId, label: string, icon: React.ComponentType<any> }[] = [
         { id: 'hero', label: 'Accueil', icon: HomeIcon },
         { id: 'services', label: 'Services', icon: LayersIcon },
@@ -185,12 +194,13 @@ const FloatingButtons = () => (
     </div>
 );
 
-const SectionTitle = ({ children }: { children: React.ReactNode }) => (
-    <h2 className="text-[32px] md:text-[40px] font-extrabold text-center mb-8 md:mb-12 w-full px-4">
-        {children}
-    </h2>
+const SectionTitle = ({ children, className = "" }: { children: React.ReactNode, className?: string }) => (
+    <div className={`w-full text-center mb-8 sm:mb-12 lg:mb-16 ${className}`}>
+        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold">
+            {children}
+        </h2>
+    </div>
 );
-
 
 //================================================================================
 // 4. SECTION COMPONENTS
@@ -198,31 +208,42 @@ const SectionTitle = ({ children }: { children: React.ReactNode }) => (
 
 // 4.1. Hero Section
 const HeroSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
-    <SectionWrapper ref={ref} id="hero">
+    <SectionWrapper ref={ref} id="hero" className="relative">
         <div className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-10 dark:opacity-20" style={{ backgroundImage: `url('/assets/hero-background.jpg')` }} />
         <div className="absolute inset-0 bg-gradient-to-t from-brand-bg-light dark:from-brand-bg-dark via-brand-bg-light/80 dark:via-brand-bg-dark/80 to-transparent" />
-        <div className="relative text-center z-10">
+        <div className="relative text-center z-10 w-full">
             <motion.h1 
-                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-                className="text-[44px] md:text-[56px] font-black leading-tight mb-4"
+                initial={{ opacity: 0, y: 20 }} 
+                animate={{ opacity: 1, y: 0 }} 
+                transition={{ duration: 0.5 }}
+                className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight mb-6"
             >
-                <span className="text-gray-700 dark:text-gray-300">Votre marketing. </span><br className="md:hidden" />
+                <span className="text-gray-700 dark:text-gray-300">Votre marketing. </span>
+                <br className="sm:hidden" />
                 <span className="bg-gradient-to-r from-brand-mint to-brand-purple bg-clip-text text-transparent animate-text-gradient bg-[200%_auto]">
                     Plus intelligent.
                 </span>
             </motion.h1>
             <motion.p 
-                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}
-                className="text-base md:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-8"
+                initial={{ opacity: 0, y: 20 }} 
+                animate={{ opacity: 1, y: 0 }} 
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="text-lg sm:text-xl lg:text-2xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mb-8 sm:mb-10"
             >
                 Nous fusionnons la créativité avec la précision de l'IA pour booster votre croissance.
             </motion.p>
             <motion.div 
-                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.4 }}
-                className="flex justify-center items-center gap-4"
+                initial={{ opacity: 0, y: 20 }} 
+                animate={{ opacity: 1, y: 0 }} 
+                transition={{ duration: 0.5, delay: 0.4 }}
+                className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6"
             >
-                <a href="#contact" className="px-6 py-3 font-bold bg-brand-text-light dark:bg-white text-brand-bg-light dark:text-black rounded-lg transition-transform hover:scale-105">Parler à un expert</a>
-                <a href="#portfolio" className="px-6 py-3 font-bold text-brand-text-light dark:text-white bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/20 rounded-lg transition-colors hover:bg-black/10 dark:hover:bg-white/20">Voir nos travaux ↓</a>
+                <a href="#contact" className="w-full sm:w-auto px-8 py-4 font-bold bg-brand-text-light dark:bg-white text-brand-bg-light dark:text-black rounded-lg transition-transform hover:scale-105 text-center">
+                    Parler à un expert
+                </a>
+                <a href="#portfolio" className="w-full sm:w-auto px-8 py-4 font-bold text-brand-text-light dark:text-white bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/20 rounded-lg transition-colors hover:bg-black/10 dark:hover:bg-white/20 text-center">
+                    Voir nos travaux ↓
+                </a>
             </motion.div>
         </div>
     </SectionWrapper>
@@ -231,21 +252,29 @@ const HeroSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
 // 4.2. Services Section
 const ServicesSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
     <SectionWrapper ref={ref} id="services">
-        <SectionTitle>Nos <span className="text-brand-mint">Services</span></SectionTitle>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl w-full max-h-[70vh] overflow-y-auto p-4">
-            {MOCK_DATA.services.map((service, index) => (
-                <motion.div
-                    key={service.title}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    viewport={{ once: true, amount: 0.5 }}
-                    className="bg-gray-50/50 dark:bg-white/5 p-6 rounded-xl border border-black/10 dark:border-white/10 hover:border-brand-mint/50 transition-colors"
-                >
-                    <h3 className="font-bold text-[22px] md:text-[28px] mb-2 text-brand-mint">{service.title}</h3>
-                    <p className="text-gray-600 dark:text-gray-400 text-base md:text-lg">{service.description}</p>
-                </motion.div>
-            ))}
+        <SectionTitle>
+            Nos <span className="text-brand-mint">Services</span>
+        </SectionTitle>
+        <div className="w-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                {MOCK_DATA.services.map((service, index) => (
+                    <motion.div
+                        key={service.title}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: index * 0.1 }}
+                        viewport={{ once: true, amount: 0.5 }}
+                        className="bg-gray-50/50 dark:bg-white/5 p-6 lg:p-8 rounded-xl border border-black/10 dark:border-white/10 hover:border-brand-mint/50 transition-colors h-full flex flex-col"
+                    >
+                        <h3 className="font-bold text-xl sm:text-2xl lg:text-3xl mb-4 text-brand-mint">
+                            {service.title}
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-400 text-base sm:text-lg flex-grow">
+                            {service.description}
+                        </p>
+                    </motion.div>
+                ))}
+            </div>
         </div>
     </SectionWrapper>
 ));
@@ -270,27 +299,47 @@ const PortfolioSection = React.forwardRef<HTMLElement, {}>((props, ref) => {
 
     return (
         <SectionWrapper ref={ref} id="portfolio">
-            <SectionTitle>Voir nos <span className="text-brand-purple">travaux</span></SectionTitle>
-            <div className="w-full max-w-7xl max-h-[75vh] flex flex-col">
-                <div className="flex justify-center gap-2 md:gap-4 mb-4">
+            <SectionTitle>
+                Voir nos <span className="text-brand-purple">travaux</span>
+            </SectionTitle>
+            <div className="w-full">
+                {/* Tab Navigation */}
+                <div className="flex flex-wrap justify-center gap-2 sm:gap-4 mb-8">
                     {tabs.map(tab => (
-                        <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`px-4 py-2 text-sm font-bold rounded-lg border transition-colors flex items-center gap-2 ${activeTab === tab.id ? 'bg-brand-purple text-white border-brand-purple' : 'border-black/10 dark:border-white/20 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10'}`}>
+                        <button 
+                            key={tab.id} 
+                            onClick={() => setActiveTab(tab.id)} 
+                            className={`px-4 py-2 text-sm font-bold rounded-lg border transition-colors flex items-center gap-2 ${
+                                activeTab === tab.id 
+                                    ? 'bg-brand-purple text-white border-brand-purple' 
+                                    : 'border-black/10 dark:border-white/20 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10'
+                            }`}
+                        >
                             <tab.icon className="w-4 h-4" />
                             <span className="hidden sm:inline">{tab.label}</span>
                         </button>
                     ))}
                 </div>
 
+                {/* Video Category Sub-navigation */}
                 <AnimatePresence>
                     {activeTab === 'video' && (
                         <motion.div
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
-                            className="flex justify-center gap-2 md:gap-3 mb-6"
+                            className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8"
                         >
                             {videoCategories.map(cat => (
-                                <button key={cat.id} onClick={() => setVideoCategory(cat.id)} className={`px-3 py-1 text-xs font-bold rounded-full transition-colors ${videoCategory === cat.id ? 'bg-brand-mint text-black' : 'bg-gray-200 dark:bg-white/10 hover:bg-gray-300 dark:hover:bg-white/20'}`}>
+                                <button 
+                                    key={cat.id} 
+                                    onClick={() => setVideoCategory(cat.id)} 
+                                    className={`px-3 py-1 text-xs font-bold rounded-full transition-colors ${
+                                        videoCategory === cat.id 
+                                            ? 'bg-brand-mint text-black' 
+                                            : 'bg-gray-200 dark:bg-white/10 hover:bg-gray-300 dark:hover:bg-white/20'
+                                    }`}
+                                >
                                     {cat.label}
                                 </button>
                             ))}
@@ -298,7 +347,8 @@ const PortfolioSection = React.forwardRef<HTMLElement, {}>((props, ref) => {
                     )}
                 </AnimatePresence>
 
-                <div className="flex-grow relative">
+                {/* Content Area */}
+                <div className="w-full">
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={`${activeTab}-${videoCategory}`}
@@ -306,58 +356,107 @@ const PortfolioSection = React.forwardRef<HTMLElement, {}>((props, ref) => {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -20 }}
                             transition={{ duration: 0.3 }}
-                            className="w-full h-full overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden p-2"
+                            className="w-full"
                         >
                             {activeTab === 'websites' && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                                     {MOCK_DATA.portfolio.websites.map(site => (
-                                        <a href={site.url} target="_blank" rel="noopener noreferrer" key={site.id} className="group bg-gray-50/50 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl overflow-hidden hover:border-brand-purple/50 transition-all p-4 flex flex-col">
-                                            <img src={site.screenshotUrl} alt={site.name} className="w-full aspect-video object-cover rounded-md mb-4 border border-black/10 dark:border-white/10" />
-                                            <h3 className="font-bold text-[22px]">{site.name}</h3>
-                                            <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">{site.client}</p>
-                                            <div className="flex flex-wrap gap-1 mt-auto pt-2">
-                                                {site.stack.map(tech => <span key={tech} className="text-xs bg-gray-200 dark:bg-white/10 px-2 py-0.5 rounded-full">{tech}</span>)}
+                                        <a 
+                                            href={site.url} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer" 
+                                            key={site.id} 
+                                            className="group bg-gray-50/50 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl overflow-hidden hover:border-brand-purple/50 transition-all p-6 flex flex-col h-full"
+                                        >
+                                            <div className="aspect-video w-full mb-4 rounded-lg overflow-hidden">
+                                                <img 
+                                                    src={site.screenshotUrl} 
+                                                    alt={site.name} 
+                                                    className="w-full h-full object-cover border border-black/10 dark:border-white/10" 
+                                                />
                                             </div>
-                                            <div className="flex items-center gap-2 text-brand-purple font-bold group-hover:underline text-sm mt-3">
+                                            <h3 className="font-bold text-xl sm:text-2xl mb-2">{site.name}</h3>
+                                            <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">{site.client}</p>
+                                            <div className="flex flex-wrap gap-2 mb-4">
+                                                {site.stack.map(tech => (
+                                                    <span key={tech} className="text-xs bg-gray-200 dark:bg-white/10 px-2 py-1 rounded-full">
+                                                        {tech}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                            <div className="flex items-center gap-2 text-brand-purple font-bold group-hover:underline text-sm mt-auto">
                                                 Visiter le Site <ArrowRightIcon className="w-4 h-4" />
                                             </div>
                                         </a>
                                     ))}
                                 </div>
                             )}
-                             {activeTab === 'video' && (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                            
+                            {activeTab === 'video' && (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                                     {MOCK_DATA.portfolio.videos.filter(v => v.category === videoCategory).map(video => (
-                                        <a href={video.videoUrl} target="_blank" rel="noopener noreferrer" key={video.id} className="bg-gray-50/50 dark:bg-white/5 p-3 rounded-xl border border-black/10 dark:border-white/10 group cursor-pointer block">
-                                            <div className="aspect-video rounded-lg overflow-hidden mb-3 relative">
-                                                <img src={video.thumbnail} alt={video.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"/>
+                                        <a 
+                                            href={video.videoUrl} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer" 
+                                            key={video.id} 
+                                            className="bg-gray-50/50 dark:bg-white/5 p-4 rounded-xl border border-black/10 dark:border-white/10 group cursor-pointer block"
+                                        >
+                                            <div className="aspect-video rounded-lg overflow-hidden mb-4 relative">
+                                                <img 
+                                                    src={video.thumbnail} 
+                                                    alt={video.title} 
+                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                                />
                                                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                                     <VideoIcon className="w-12 h-12 text-white" />
                                                 </div>
                                             </div>
-                                            <h3 className="font-bold text-base md:text-lg">{video.title}</h3>
+                                            <h3 className="font-bold text-lg sm:text-xl">{video.title}</h3>
                                         </a>
                                     ))}
                                 </div>
                             )}
+                            
                             {activeTab === 'branding' && (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                                     {MOCK_DATA.portfolio.brands.map(brand => (
-                                        <div key={brand.id} className="bg-gray-50/50 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-6 flex flex-col justify-center items-center text-center aspect-square">
-                                            <img src={brand.logoUrl} alt={`${brand.name} Logo`} className="h-16 mb-4 object-contain"/>
-                                            <h3 className="font-bold text-[22px] md:text-[28px]">{brand.name}</h3>
-                                            <p className="text-gray-600 dark:text-gray-400 italic text-base md:text-lg">"{brand.tagline}"</p>
+                                        <div 
+                                            key={brand.id} 
+                                            className="bg-gray-50/50 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-8 flex flex-col justify-center items-center text-center aspect-square"
+                                        >
+                                            <div className="h-16 mb-6 flex items-center justify-center">
+                                                <img 
+                                                    src={brand.logoUrl} 
+                                                    alt={`${brand.name} Logo`} 
+                                                    className="max-h-full max-w-full object-contain"
+                                                />
+                                            </div>
+                                            <h3 className="font-bold text-xl sm:text-2xl mb-2">{brand.name}</h3>
+                                            <p className="text-gray-600 dark:text-gray-400 italic text-base sm:text-lg">
+                                                "{brand.tagline}"
+                                            </p>
                                         </div>
                                     ))}
                                 </div>
                             )}
+                            
                             {activeTab === 'photography' && (
-                                <div className="columns-2 sm:columns-3 gap-4">
+                                <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 lg:gap-8">
                                     {MOCK_DATA.portfolio.photos.map(photo => (
-                                        <div key={photo.id} className="mb-4 break-inside-avoid group relative overflow-hidden rounded-lg">
-                                            <img src={photo.src} alt={photo.title} className="w-full h-auto rounded-lg" />
+                                        <div 
+                                            key={photo.id} 
+                                            className="mb-6 lg:mb-8 break-inside-avoid group relative overflow-hidden rounded-lg"
+                                        >
+                                            <img 
+                                                src={photo.src} 
+                                                alt={photo.title} 
+                                                className="w-full h-auto rounded-lg" 
+                                            />
                                             <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                                                <h3 className="text-white font-bold text-base md:text-lg">{photo.title}</h3>
+                                                <h3 className="text-white font-bold text-lg sm:text-xl">
+                                                    {photo.title}
+                                                </h3>
                                             </div>
                                         </div>
                                     ))}
@@ -374,26 +473,36 @@ const PortfolioSection = React.forwardRef<HTMLElement, {}>((props, ref) => {
 // 4.4. Process Section
 const ProcessSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
     <SectionWrapper ref={ref} id="process">
-        <SectionTitle>Notre <span className="text-brand-mint">Méthodologie</span></SectionTitle>
-        <div className="w-full max-w-5xl space-y-8">
-            {MOCK_DATA.processSteps.map((step, index) => (
-                 <motion.div
-                    key={step.number}
-                    initial={{ opacity: 0, x: -50 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.15 }}
-                    viewport={{ once: true, amount: 0.6 }}
-                    className="flex items-center gap-6"
-                >
-                    <div className="flex-shrink-0 w-16 h-16 bg-gray-100 dark:bg-white/5 border-2 border-brand-mint rounded-full flex items-center justify-center">
-                        <span className="text-2xl font-extrabold text-brand-mint">{`0${step.number}`}</span>
-                    </div>
-                    <div>
-                        <h3 className="font-bold text-[22px] md:text-[28px] text-brand-text-light dark:text-white mb-1">{step.title}</h3>
-                        <p className="text-gray-600 dark:text-gray-400 text-base md:text-lg">{step.description}</p>
-                    </div>
-                </motion.div>
-            ))}
+        <SectionTitle>
+            Notre <span className="text-brand-mint">Méthodologie</span>
+        </SectionTitle>
+        <div className="w-full max-w-4xl mx-auto">
+            <div className="space-y-8 lg:space-y-12">
+                {MOCK_DATA.processSteps.map((step, index) => (
+                    <motion.div
+                        key={step.number}
+                        initial={{ opacity: 0, x: -50 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5, delay: index * 0.15 }}
+                        viewport={{ once: true, amount: 0.6 }}
+                        className="flex flex-col sm:flex-row items-start sm:items-center gap-6 lg:gap-8"
+                    >
+                        <div className="flex-shrink-0 w-16 h-16 lg:w-20 lg:h-20 bg-gray-100 dark:bg-white/5 border-2 border-brand-mint rounded-full flex items-center justify-center mx-auto sm:mx-0">
+                            <span className="text-xl lg:text-2xl font-extrabold text-brand-mint">
+                                {`0${step.number}`}
+                            </span>
+                        </div>
+                        <div className="text-center sm:text-left flex-grow">
+                            <h3 className="font-bold text-xl sm:text-2xl lg:text-3xl text-brand-text-light dark:text-white mb-3">
+                                {step.title}
+                            </h3>
+                            <p className="text-gray-600 dark:text-gray-400 text-base sm:text-lg lg:text-xl">
+                                {step.description}
+                            </p>
+                        </div>
+                    </motion.div>
+                ))}
+            </div>
         </div>
     </SectionWrapper>
 ));
@@ -401,49 +510,88 @@ const ProcessSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
 // 4.5. About Section
 const AboutSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
     <SectionWrapper ref={ref} id="about">
-        <SectionTitle>Pourquoi <span className="text-brand-purple">Digital Move Up</span></SectionTitle>
-        <div className="grid md:grid-cols-2 gap-8 w-full max-w-5xl items-center">
-            <div className="text-center md:text-left">
-                <h3 className="text-[28px] font-extrabold mb-4">Notre Mission</h3>
-                <p className="text-gray-700 dark:text-gray-300 mb-6 text-base md:text-lg">Nous fusionnons passion créative et précision de l'IA pour aider les marques à naviguer dans le paysage numérique et à atteindre une croissance exponentielle.</p>
-                <h4 className="font-extrabold text-xl mb-3">Nos Valeurs:</h4>
-                <div className="flex flex-wrap gap-2 justify-center md:justify-start">
-                    {['Innovation', 'Transparence', 'Performance', 'Partenariat'].map(tech => (
-                         <span key={tech} className="text-sm font-medium bg-gray-200 dark:bg-white/10 px-3 py-1 rounded-full">{tech}</span>
-                    ))}
+        <SectionTitle>
+            Pourquoi <span className="text-brand-purple">Digital Move Up</span>
+        </SectionTitle>
+        <div className="w-full">
+            <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                <div className="text-center lg:text-left order-2 lg:order-1">
+                    <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold mb-6">
+                        Notre Mission
+                    </h3>
+                    <p className="text-gray-700 dark:text-gray-300 mb-8 text-lg sm:text-xl lg:text-2xl leading-relaxed">
+                        Nous fusionnons passion créative et précision de l'IA pour aider les marques à naviguer dans le paysage numérique et à atteindre une croissance exponentielle.
+                    </p>
+                    <h4 className="font-extrabold text-xl sm:text-2xl mb-6">Nos Valeurs:</h4>
+                    <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
+                        {['Innovation', 'Transparence', 'Performance', 'Partenariat'].map(value => (
+                            <span 
+                                key={value} 
+                                className="text-sm sm:text-base font-medium bg-gray-200 dark:bg-white/10 px-4 py-2 rounded-full"
+                            >
+                                {value}
+                            </span>
+                        ))}
+                    </div>
                 </div>
-            </div>
-            <div className="flex flex-col items-center">
-                 <Lottie
-                    loop
-                    animationData={aiBrainLottieData}
-                    play
-                    style={{ width: '100%', maxWidth: 300, height: 'auto' }}
-                />
-                <p className="text-gray-600 dark:text-gray-400 mt-2 text-center text-[13px] md:text-sm">Propulsé par Imed, notre noyau IA.</p>
+                <div className="flex flex-col items-center order-1 lg:order-2">
+                    <div className="w-full max-w-sm lg:max-w-md">
+                        <Lottie
+                            loop
+                            animationData={aiBrainLottieData}
+                            play
+                            style={{ width: '100%', height: 'auto' }}
+                        />
+                    </div>
+                    <p className="text-gray-600 dark:text-gray-400 mt-4 text-center text-sm sm:text-base">
+                        Propulsé par Imed, notre noyau IA.
+                    </p>
+                </div>
             </div>
         </div>
     </SectionWrapper>
 ));
 
-// 4.6. Clients Section (Formerly Testimonials)
-// FIX: Renamed TestimonialsSection to ClientsSection for clarity.
+// 4.6. Clients Section
 const ClientsSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
     <SectionWrapper ref={ref} id="clients">
-        <SectionTitle>Nos <span className="text-brand-mint">Clients</span></SectionTitle>
-        <div className="w-full max-w-7xl flex items-center gap-8 overflow-x-auto snap-x snap-mandatory py-8 px-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-            {MOCK_DATA.testimonials.map(testimonial => (
-                <div key={testimonial.author} className="snap-center flex-shrink-0 w-[90vw] md:w-[450px] bg-gray-50/50 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl p-8 flex flex-col justify-center backdrop-blur-sm">
-                    <p className="text-base md:text-lg italic mb-6">"{testimonial.quote}"</p>
-                    <div className="flex items-center gap-4">
-                        <img src={testimonial.logo} alt={`${testimonial.company} logo`} className="w-12 h-12 rounded-full object-contain bg-white/80 p-1" />
-                        <div>
-                            <p className="font-bold text-brand-text-light dark:text-white">{testimonial.author}</p>
-                            <p className="text-[13px] md:text-sm text-gray-600 dark:text-gray-400">{testimonial.company}</p>
+        <SectionTitle>
+            Nos <span className="text-brand-mint">Clients</span>
+        </SectionTitle>
+        <div className="w-full">
+            <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12 overflow-x-auto snap-x snap-mandatory lg:overflow-visible">
+                {MOCK_DATA.testimonials.map((testimonial, index) => (
+                    <motion.div 
+                        key={testimonial.author}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: index * 0.2 }}
+                        viewport={{ once: true, amount: 0.5 }}
+                        className="snap-center flex-shrink-0 w-full lg:w-96 bg-gray-50/50 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl p-8 lg:p-10 flex flex-col justify-center backdrop-blur-sm h-full"
+                    >
+                        <p className="text-lg sm:text-xl lg:text-2xl italic mb-8 leading-relaxed">
+                            "{testimonial.quote}"
+                        </p>
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-full bg-white/80 p-2 flex-shrink-0">
+                                <img 
+                                    src={testimonial.logo} 
+                                    alt={`${testimonial.company} logo`} 
+                                    className="w-full h-full object-contain" 
+                                />
+                            </div>
+                            <div>
+                                <p className="font-bold text-brand-text-light dark:text-white text-lg sm:text-xl">
+                                    {testimonial.author}
+                                </p>
+                                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+                                    {testimonial.company}
+                                </p>
+                            </div>
                         </div>
-                    </div>
-                </div>
-            ))}
+                    </motion.div>
+                ))}
+            </div>
         </div>
     </SectionWrapper>
 ));
@@ -451,18 +599,46 @@ const ClientsSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
 // 4.7. Contact Section
 const ContactSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
     <SectionWrapper ref={ref} id="contact">
-        <SectionTitle>Parlons de votre <span className="text-brand-purple">projet</span></SectionTitle>
-        <div className="w-full max-w-md bg-gray-50/50 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl p-8 backdrop-blur-sm">
-            <form className="space-y-4">
-                <input type="text" placeholder="Votre Nom" className="w-full bg-gray-100 dark:bg-white/5 p-3 rounded-lg border border-black/10 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
-                <input type="email" placeholder="Votre Email" className="w-full bg-gray-100 dark:bg-white/5 p-3 rounded-lg border border-black/10 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-brand-purple" />
-                <textarea placeholder="Votre Message" rows={4} className="w-full bg-gray-100 dark:bg-white/5 p-3 rounded-lg border border-black/10 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-brand-purple"></textarea>
-                <button type="submit" className="w-full p-3 font-bold bg-gradient-to-r from-brand-mint to-brand-purple text-black rounded-lg transition-transform hover:scale-105">Envoyer le Message</button>
-            </form>
-            <div className="text-center my-4 text-gray-500 dark:text-gray-400">OU</div>
-            <a href="https://calendly.com/" target="_blank" rel="noopener noreferrer" className="block w-full text-center p-3 font-bold bg-gray-200 dark:bg-white/10 border border-black/10 dark:border-white/20 text-brand-text-light dark:text-white rounded-lg transition-colors hover:bg-gray-300 dark:hover:bg-white/20">
-                Réserver un appel sur Calendly
-            </a>
+        <SectionTitle>
+            Parlons de votre <span className="text-brand-purple">projet</span>
+        </SectionTitle>
+        <div className="w-full max-w-lg mx-auto">
+            <div className="bg-gray-50/50 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl p-8 lg:p-10 backdrop-blur-sm">
+                <form className="space-y-6">
+                    <input 
+                        type="text" 
+                        placeholder="Votre Nom" 
+                        className="w-full bg-gray-100 dark:bg-white/5 p-4 rounded-lg border border-black/10 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-brand-purple text-base sm:text-lg" 
+                    />
+                    <input 
+                        type="email" 
+                        placeholder="Votre Email" 
+                        className="w-full bg-gray-100 dark:bg-white/5 p-4 rounded-lg border border-black/10 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-brand-purple text-base sm:text-lg" 
+                    />
+                    <textarea 
+                        placeholder="Votre Message" 
+                        rows={5} 
+                        className="w-full bg-gray-100 dark:bg-white/5 p-4 rounded-lg border border-black/10 dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-brand-purple text-base sm:text-lg resize-none"
+                    ></textarea>
+                    <button 
+                        type="submit" 
+                        className="w-full p-4 font-bold bg-gradient-to-r from-brand-mint to-brand-purple text-black rounded-lg transition-transform hover:scale-105 text-base sm:text-lg"
+                    >
+                        Envoyer le Message
+                    </button>
+                </form>
+                <div className="text-center my-6 text-gray-500 dark:text-gray-400 text-base sm:text-lg">
+                    OU
+                </div>
+                <a 
+                    href="https://calendly.com/" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="block w-full text-center p-4 font-bold bg-gray-200 dark:bg-white/10 border border-black/10 dark:border-white/20 text-brand-text-light dark:text-white rounded-lg transition-colors hover:bg-gray-300 dark:hover:bg-white/20 text-base sm:text-lg"
+                >
+                    Réserver un appel sur Calendly
+                </a>
+            </div>
         </div>
     </SectionWrapper>
 ));
@@ -494,10 +670,8 @@ export default function App() {
         setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
     };
     
-    // FIX: Updated section IDs to reflect the 'clients' section rename.
     const sectionIds: SectionId[] = ['hero', 'services', 'portfolio', 'process', 'about', 'clients', 'contact'];
     
-    // FIX: Updated refs to match renamed 'clients' section.
     const refs = {
         hero: useRef<HTMLElement>(null),
         services: useRef<HTMLElement>(null),
@@ -508,7 +682,6 @@ export default function App() {
         contact: useRef<HTMLElement>(null),
     };
 
-    // FIX: Updated inView hooks for the renamed 'clients' section.
     const inViewHooks = {
         hero: useInView(refs.hero, { amount: 0.5 }),
         services: useInView(refs.services, { amount: 0.5 }),
@@ -524,19 +697,11 @@ export default function App() {
         if (visibleSections.length > 0) {
             setActiveSection(visibleSections[visibleSections.length - 1]);
         }
-    // FIX: Updated dependency array for the section visibility effect.
     }, [inViewHooks.hero, inViewHooks.services, inViewHooks.portfolio, inViewHooks.process, inViewHooks.about, inViewHooks.clients, inViewHooks.contact]);
-
 
     return (
         <>
             <NavbarTop theme={theme} toggleTheme={toggleTheme} />
-            {/* 
-              Each section component is rendered sequentially here.
-              They are siblings within the <main> tag and are not nested inside one another,
-              ensuring a clean, flat structure as requested. The scroll-snap behavior
-              makes them appear to "take over" the screen, but they are distinct sections in the DOM.
-            */}
             <main>
                 <HeroSection ref={refs.hero} />
                 <ServicesSection ref={refs.services} />
