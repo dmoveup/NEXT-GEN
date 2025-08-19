@@ -2,11 +2,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, useInView, useMotionValue, AnimatePresence } from 'framer-motion';
 import Lottie from 'react-lottie-player';
+import aiBrainLottieData from '/assets/lottie/ai-brain.json';
 
 //================================================================================
 // 0. MOCK LOTTIE ANIMATION DATA
 //================================================================================
-const aiBrainLottie = "/assets/lottie/ai-brain.json";
 
 
 //================================================================================
@@ -416,7 +416,7 @@ const AboutSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
             <div className="flex flex-col items-center">
                  <Lottie
                     loop
-                    path={aiBrainLottie}
+                    animationData={aiBrainLottieData}
                     play
                     style={{ width: '100%', maxWidth: 300, height: 'auto' }}
                 />
