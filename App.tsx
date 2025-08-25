@@ -264,34 +264,134 @@ const HeroSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
 ));
 
 // 4.2. Services Section
-const ServicesSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
-    <SectionWrapper ref={ref} id="services">
-        <SectionTitle>
-            Nos <span className="text-brand-mint">Services</span>
-        </SectionTitle>
-        <div className="w-full">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-                {MOCK_DATA.services.map((service, index) => (
-                    <motion.div
-                        key={service.title}
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: index * 0.1 }}
-                        viewport={{ once: true, amount: 0.5 }}
-                        className="bg-gray-50/50 dark:bg-white/5 p-6 lg:p-8 rounded-xl border border-black/10 dark:border-white/10 hover:border-brand-mint/50 transition-colors h-full flex flex-col"
-                    >
-                        <h3 className="font-bold text-xl sm:text-2xl lg:text-3xl mb-4 text-brand-mint">
-                            {service.title}
-                        </h3>
-                        <p className="text-gray-600 dark:text-gray-400 text-base sm:text-lg flex-grow">
-                            {service.description}
-                        </p>
-                    </motion.div>
-                ))}
-            </div>
-        </div>
-    </SectionWrapper>
-));
+const ServicesSection = React.forwardRef<HTMLElement, {}>((props, ref) => {
+	const [isDesktop, setIsDesktop] = useState<boolean>(typeof window !== 'undefined' ? window.innerWidth >= 768 : true);
+	const [openIndexDesktop, setOpenIndexDesktop] = useState<number | null>(null);
+	const [openMobile, setOpenMobile] = useState<Set<number>>(new Set());
+
+	useEffect(() => {
+		const onResize = () => setIsDesktop(window.innerWidth >= 768);
+		window.addEventListener('resize', onResize);
+		return () => window.removeEventListener('resize', onResize);
+	}, []);
+
+	const getIsOpen = (index: number) => (isDesktop ? openIndexDesktop === index : openMobile.has(index));
+
+	const toggleIndex = (index: number, cardRef: React.RefObject<HTMLDivElement>) => {
+		const element = cardRef.current;
+		const prevTop = element ? element.getBoundingClientRect().top : 0;
+
+		if (isDesktop) {
+			setOpenIndexDesktop(prev => (prev === index ? null : index));
+		} else {
+			setOpenMobile(prev => {
+				const next = new Set(prev);
+				if (next.has(index)) next.delete(index); else next.add(index);
+				return next;
+			});
+		}
+
+		requestAnimationFrame(() => {
+			const newTop = element ? element.getBoundingClientRect().top : 0;
+			const delta = newTop - prevTop;
+			if (Math.abs(delta) > 1) window.scrollBy({ top: delta, left: 0 });
+		});
+	};
+
+	const iconForService = (title: string): React.ComponentType<any> => {
+		const lower = title.toLowerCase();
+		if (lower.includes('sponsor') || lower.includes('ads') || lower.includes('seo')) return TrendingUpIcon;
+		if (lower.includes('web') || lower.includes('mobile')) return GlobeIcon;
+		if (lower.includes('vid') || lower.includes('design')) return CameraIcon;
+		if (lower.includes('réseaux') || lower.includes('sociaux') || lower.includes('social')) return UsersIcon;
+		if (lower.includes('consult')) return MessageSquareIcon;
+		return LayersIcon;
+	};
+
+	const truncate = (text: string, max = 90) => (text.length > max ? text.slice(0, max - 1) + '…' : text);
+
+	return (
+		<SectionWrapper ref={ref} id="services">
+			<SectionTitle>
+				Nos <span className="text-brand-mint">Services</span>
+			</SectionTitle>
+			<div className="w-full">
+				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+					{MOCK_DATA.services.map((service, index) => {
+						const CardIcon = iconForService(service.title);
+						const isOpen = getIsOpen(index);
+						const contentId = `service-content-${index}`;
+						const cardRef = React.createRef<HTMLDivElement>();
+
+						return (
+							<motion.div
+								key={service.title}
+								ref={cardRef}
+								layout
+								initial={{ opacity: 0, y: 16 }}
+								whileInView={{ opacity: 1, y: 0 }}
+								viewport={{ once: true, amount: 0.3 }}
+								transition={{ duration: 0.35, ease: 'easeOut' }}
+								className="group relative rounded-2xl border border-black/10 dark:border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-sm shadow-sm hover:shadow-md transition-shadow"
+							>
+								<button
+									type="button"
+									onClick={() => toggleIndex(index, cardRef)}
+									onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleIndex(index, cardRef); } }}
+									aria-expanded={isOpen}
+									aria-controls={contentId}
+									className="w-full px-5 py-6 sm:py-7 flex flex-col items-center justify-center gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-mint rounded-2xl"
+								>
+									<div className="flex items-center justify-center w-12 h-12 rounded-full bg-brand-mint/15 text-brand-mint">
+										<CardIcon className="w-6 h-6" />
+									</div>
+									<h3 className="text-center text-base sm:text-lg font-extrabold">
+										{service.title}
+									</h3>
+
+									{!isOpen && (
+										<div className="pointer-events-none absolute left-1/2 -translate-x-1/2 -top-2 -translate-y-full opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-200">
+											<div className="rounded-xl border border-black/10 dark:border-white/10 bg-white/70 dark:bg-black/40 backdrop-blur-md px-3 py-2 shadow">
+												<p className="text-xs sm:text-sm text-gray-700 dark:text-gray-200 whitespace-pre-line max-w-[16rem] text-center">
+													{truncate(service.description, 100)}
+												</p>
+											</div>
+										</div>
+									)}
+
+									<span aria-hidden="true" className="absolute right-3 top-3 inline-flex items-center justify-center w-7 h-7 rounded-full bg-black/5 dark:bg-white/10">
+										<span className={`relative block w-3 h-3 transition-transform ${isOpen ? 'rotate-0' : 'rotate-0'}`}>
+											<span className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-0.5 bg-current"></span>
+											<span className={`absolute left-1/2 top-0 -translate-x-1/2 h-full w-0.5 bg-current transition-transform ${isOpen ? 'scale-y-0' : 'scale-y-100'}`}></span>
+										</span>
+									</span>
+								</button>
+
+								<AnimatePresence initial={false}>
+									{isOpen && (
+										<motion.div
+											id={contentId}
+											key="content"
+											initial={{ opacity: 0, height: 0 }}
+											animate={{ opacity: 1, height: 'auto' }}
+											exit={{ opacity: 0, height: 0 }}
+											transition={{ duration: 0.25, ease: 'easeInOut' }}
+											className="px-5 pb-5"
+										>
+											<div className="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">
+												{service.description}
+											</div>
+										</motion.div>
+									)}
+								</AnimatePresence>
+							</motion.div>
+						);
+					})}
+				</div>
+			</div>
+		</SectionWrapper>
+	);
+});
 
 // 4.3. Portfolio Section
 const PortfolioSection = React.forwardRef<HTMLElement, {}>((props, ref) => {
