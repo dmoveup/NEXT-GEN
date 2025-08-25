@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, useInView, useMotionValue, AnimatePresence } from 'framer-motion';
 import Lottie from 'react-lottie-player';
+import { Carousel } from './src/components/Carousel';
+import { VideoModal } from './src/components/VideoModal';
+import { getYouTubeThumbnail, isYouTubeUrl } from './src/utils/youtube';
 import aiBrainLottieData from './src/assets/lottie/ai-brain.json';
 
 //================================================================================
@@ -36,6 +39,15 @@ type SectionId = 'hero' | 'services' | 'portfolio' | 'process' | 'about' | 'clie
 type PortfolioTab = 'websites' | 'video' | 'branding' | 'photography';
 type VideoCategory = 'cinematic' | 'ai' | 'ecom';
 
+interface VideoItem {
+    id: string;
+    title: string;
+    category: VideoCategory;
+    thumbnail: string;
+    videoUrl: string;
+    isYouTube?: boolean;
+}
+
 const MOCK_DATA = {
     services: [
         { title: "Sponsoring & Ads", description: "Campagnes publicitaires ciblées sur Meta, Google & TikTok pour un ROI maximal." },
@@ -47,14 +59,15 @@ const MOCK_DATA = {
     ],
     portfolio: {
         videos: [
-            { id: 'cine1', title: "L'Histoire de la Marque", category: 'cinematic' as VideoCategory, thumbnail: ASSET_PATHS.videos.thumbnails[0], videoUrl: ASSET_PATHS.videos.reels[0] },
-            { id: 'cine2', title: "Court-métrage 'Origines'", category: 'cinematic' as VideoCategory, thumbnail: ASSET_PATHS.videos.thumbnails[1], videoUrl: ASSET_PATHS.videos.reels[1] },
-            { id: 'cine3', title: "Pub Produit Révolutionnaire", category: 'cinematic' as VideoCategory, thumbnail: ASSET_PATHS.videos.thumbnails[2], videoUrl: ASSET_PATHS.videos.reels[2] },
-            { id: 'ai1', title: "Visualiseur de Données IA", category: 'ai' as VideoCategory, thumbnail: ASSET_PATHS.aiVideos.thumbnails[0], videoUrl: ASSET_PATHS.aiVideos.videos[0] },
-            { id: 'ai2', title: "Animation Logo Générative", category: 'ai' as VideoCategory, thumbnail: ASSET_PATHS.aiVideos.thumbnails[1], videoUrl: ASSET_PATHS.aiVideos.videos[1] },
-            { id: 'ai3', title: "Démo Unboxing IA", category: 'ai' as VideoCategory, thumbnail: ASSET_PATHS.aiVideos.thumbnails[2], videoUrl: ASSET_PATHS.aiVideos.videos[2] },
-            { id: 'ecom1', title: "Publicité Produit High-Tech", category: 'ecom' as VideoCategory, thumbnail: ASSET_PATHS.videos.thumbnails[3], videoUrl: ASSET_PATHS.videos.ecom[0] },
-            { id: 'ecom2', title: "Tutoriel Mode & Beauté", category: 'ecom' as VideoCategory, thumbnail: ASSET_PATHS.videos.thumbnails[4], videoUrl: ASSET_PATHS.videos.ecom[1] },
+            { id: 'cine1', title: "L'Histoire de la Marque", category: 'cinematic' as VideoCategory, thumbnail: ASSET_PATHS.videos.thumbnails[0], videoUrl: ASSET_PATHS.videos.reels[0], isYouTube: false },
+            { id: 'cine2', title: "Court-métrage 'Origines'", category: 'cinematic' as VideoCategory, thumbnail: ASSET_PATHS.videos.thumbnails[1], videoUrl: ASSET_PATHS.videos.reels[1], isYouTube: false },
+            { id: 'cine3', title: "Pub Produit Révolutionnaire", category: 'cinematic' as VideoCategory, thumbnail: ASSET_PATHS.videos.thumbnails[2], videoUrl: ASSET_PATHS.videos.reels[2], isYouTube: false },
+            { id: 'youtube1', title: "Demo YouTube Video", category: 'cinematic' as VideoCategory, thumbnail: getYouTubeThumbnail('https://www.youtube.com/watch?v=dQw4w9WgXcQ'), videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', isYouTube: true },
+            { id: 'ai1', title: "Visualiseur de Données IA", category: 'ai' as VideoCategory, thumbnail: ASSET_PATHS.aiVideos.thumbnails[0], videoUrl: ASSET_PATHS.aiVideos.videos[0], isYouTube: false },
+            { id: 'ai2', title: "Animation Logo Générative", category: 'ai' as VideoCategory, thumbnail: ASSET_PATHS.aiVideos.thumbnails[1], videoUrl: ASSET_PATHS.aiVideos.videos[1], isYouTube: false },
+            { id: 'ai3', title: "Démo Unboxing IA", category: 'ai' as VideoCategory, thumbnail: ASSET_PATHS.aiVideos.thumbnails[2], videoUrl: ASSET_PATHS.aiVideos.videos[2], isYouTube: false },
+            { id: 'ecom1', title: "Publicité Produit High-Tech", category: 'ecom' as VideoCategory, thumbnail: ASSET_PATHS.videos.thumbnails[3], videoUrl: ASSET_PATHS.videos.ecom[0], isYouTube: false },
+            { id: 'ecom2', title: "Tutoriel Mode & Beauté", category: 'ecom' as VideoCategory, thumbnail: ASSET_PATHS.videos.thumbnails[4], videoUrl: ASSET_PATHS.videos.ecom[1], isYouTube: false },
         ],
         photos: [
             { id: 1, src: ASSET_PATHS.photos.events[0], title: 'Rêves de Néon', category: 'Événements' },
@@ -283,6 +296,7 @@ const ServicesSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
 const PortfolioSection = React.forwardRef<HTMLElement, {}>((props, ref) => {
     const [activeTab, setActiveTab] = useState<PortfolioTab>('websites');
     const [videoCategory, setVideoCategory] = useState<VideoCategory>('cinematic');
+    const [selectedVideo, setSelectedVideo] = useState<VideoItem | null>(null);
 
     const tabs: {id: PortfolioTab, label: string, icon: React.ComponentType<any>}[] = [
         { id: 'websites', label: 'Sites Web', icon: GlobeIcon },
@@ -348,7 +362,7 @@ const PortfolioSection = React.forwardRef<HTMLElement, {}>((props, ref) => {
                 </AnimatePresence>
 
                 {/* Content Area */}
-                <div className="w-full">
+                <div className="w-full min-h-[400px]">
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={`${activeTab}-${videoCategory}`}
@@ -359,14 +373,14 @@ const PortfolioSection = React.forwardRef<HTMLElement, {}>((props, ref) => {
                             className="w-full"
                         >
                             {activeTab === 'websites' && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                                <Carousel itemsPerView={3} className="w-full">
                                     {MOCK_DATA.portfolio.websites.map(site => (
                                         <a 
                                             href={site.url} 
                                             target="_blank" 
                                             rel="noopener noreferrer" 
                                             key={site.id} 
-                                            className="group bg-gray-50/50 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl overflow-hidden hover:border-brand-purple/50 transition-all p-6 flex flex-col h-full"
+                                            className="group bg-gray-50/50 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl overflow-hidden hover:border-brand-purple/50 transition-all p-4 lg:p-6 flex flex-col h-full"
                                         >
                                             <div className="aspect-video w-full mb-4 rounded-lg overflow-hidden">
                                                 <img 
@@ -375,7 +389,7 @@ const PortfolioSection = React.forwardRef<HTMLElement, {}>((props, ref) => {
                                                     className="w-full h-full object-cover border border-black/10 dark:border-white/10" 
                                                 />
                                             </div>
-                                            <h3 className="font-bold text-xl sm:text-2xl mb-2">{site.name}</h3>
+                                            <h3 className="font-bold text-lg lg:text-xl mb-2">{site.name}</h3>
                                             <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">{site.client}</p>
                                             <div className="flex flex-wrap gap-2 mb-4">
                                                 {site.stack.map(tech => (
@@ -389,78 +403,94 @@ const PortfolioSection = React.forwardRef<HTMLElement, {}>((props, ref) => {
                                             </div>
                                         </a>
                                     ))}
-                                </div>
+                                </Carousel>
                             )}
                             
                             {activeTab === 'video' && (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-                                    {MOCK_DATA.portfolio.videos.filter(v => v.category === videoCategory).map(video => (
-                                        <a 
-                                            href={video.videoUrl} 
-                                            target="_blank" 
-                                            rel="noopener noreferrer" 
-                                            key={video.id} 
-                                            className="bg-gray-50/50 dark:bg-white/5 p-4 rounded-xl border border-black/10 dark:border-white/10 group cursor-pointer block"
-                                        >
-                                            <div className="aspect-video rounded-lg overflow-hidden mb-4 relative">
-                                                <img 
-                                                    src={video.thumbnail} 
-                                                    alt={video.title} 
-                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                                />
-                                                <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <VideoIcon className="w-12 h-12 text-white" />
+                                <>
+                                    <Carousel itemsPerView={3} className="w-full">
+                                        {MOCK_DATA.portfolio.videos.filter(v => v.category === videoCategory).map(video => (
+                                            <div 
+                                                key={video.id} 
+                                                onClick={() => setSelectedVideo(video)}
+                                                className="bg-gray-50/50 dark:bg-white/5 p-4 rounded-xl border border-black/10 dark:border-white/10 group cursor-pointer"
+                                            >
+                                                <div className="aspect-video rounded-lg overflow-hidden mb-4 relative">
+                                                    <img 
+                                                        src={video.thumbnail} 
+                                                        alt={video.title} 
+                                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                                    />
+                                                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <VideoIcon className="w-12 h-12 text-white" />
+                                                    </div>
+                                                    {video.isYouTube && (
+                                                        <div className="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded">
+                                                            YouTube
+                                                        </div>
+                                                    )}
                                                 </div>
+                                                <h3 className="font-bold text-lg">{video.title}</h3>
                                             </div>
-                                            <h3 className="font-bold text-lg sm:text-xl">{video.title}</h3>
-                                        </a>
-                                    ))}
-                                </div>
+                                        ))}
+                                    </Carousel>
+                                    <VideoModal
+                                        isOpen={!!selectedVideo}
+                                        onClose={() => setSelectedVideo(null)}
+                                        videoUrl={selectedVideo?.videoUrl || ''}
+                                        title={selectedVideo?.title || ''}
+                                    />
+                                </>
                             )}
                             
                             {activeTab === 'branding' && (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                                <Carousel itemsPerView={3} className="w-full">
                                     {MOCK_DATA.portfolio.brands.map(brand => (
                                         <div 
                                             key={brand.id} 
-                                            className="bg-gray-50/50 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-8 flex flex-col justify-center items-center text-center aspect-square"
+                                            className="bg-gray-50/50 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-6 lg:p-8 flex flex-col justify-center items-center text-center aspect-square"
                                         >
-                                            <div className="h-16 mb-6 flex items-center justify-center">
+                                            <div className="h-12 lg:h-16 mb-4 lg:mb-6 flex items-center justify-center">
                                                 <img 
                                                     src={brand.logoUrl} 
                                                     alt={`${brand.name} Logo`} 
                                                     className="max-h-full max-w-full object-contain"
                                                 />
                                             </div>
-                                            <h3 className="font-bold text-xl sm:text-2xl mb-2">{brand.name}</h3>
-                                            <p className="text-gray-600 dark:text-gray-400 italic text-base sm:text-lg">
+                                            <h3 className="font-bold text-lg lg:text-xl mb-2">{brand.name}</h3>
+                                            <p className="text-gray-600 dark:text-gray-400 italic text-sm lg:text-base">
                                                 "{brand.tagline}"
                                             </p>
                                         </div>
                                     ))}
-                                </div>
+                                </Carousel>
                             )}
                             
                             {activeTab === 'photography' && (
-                                <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 lg:gap-8">
+                                <Carousel itemsPerView={3} className="w-full">
                                     {MOCK_DATA.portfolio.photos.map(photo => (
                                         <div 
                                             key={photo.id} 
-                                            className="mb-6 lg:mb-8 break-inside-avoid group relative overflow-hidden rounded-lg"
+                                            className="group relative overflow-hidden rounded-lg aspect-[4/5]"
                                         >
                                             <img 
                                                 src={photo.src} 
                                                 alt={photo.title} 
-                                                className="w-full h-auto rounded-lg" 
+                                                className="w-full h-full object-cover rounded-lg" 
                                             />
                                             <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                                                <h3 className="text-white font-bold text-lg sm:text-xl">
-                                                    {photo.title}
-                                                </h3>
+                                                <div>
+                                                    <h3 className="text-white font-bold text-lg mb-1">
+                                                        {photo.title}
+                                                    </h3>
+                                                    <p className="text-gray-300 text-sm">
+                                                        {photo.category}
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
                                     ))}
-                                </div>
+                                </Carousel>
                             )}
                         </motion.div>
                     </AnimatePresence>
@@ -559,7 +589,7 @@ const ClientsSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
             Nos <span className="text-brand-mint">Clients</span>
         </SectionTitle>
         <div className="w-full">
-            <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12 overflow-x-auto snap-x snap-mandatory lg:overflow-visible">
+            <Carousel itemsPerView={3} className="w-full">
                 {MOCK_DATA.testimonials.map((testimonial, index) => (
                     <motion.div 
                         key={testimonial.author}
@@ -567,13 +597,13 @@ const ClientsSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: index * 0.2 }}
                         viewport={{ once: true, amount: 0.5 }}
-                        className="snap-center flex-shrink-0 w-full lg:w-96 bg-gray-50/50 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl p-8 lg:p-10 flex flex-col justify-center backdrop-blur-sm h-full"
+                        className="bg-gray-50/50 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl p-6 lg:p-8 flex flex-col justify-center backdrop-blur-sm h-full min-h-[300px]"
                     >
-                        <p className="text-lg sm:text-xl lg:text-2xl italic mb-8 leading-relaxed">
+                        <p className="text-base lg:text-lg italic mb-6 leading-relaxed flex-grow">
                             "{testimonial.quote}"
                         </p>
                         <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-full bg-white/80 p-2 flex-shrink-0">
+                            <div className="w-12 h-12 rounded-full bg-white/80 p-2 flex-shrink-0">
                                 <img 
                                     src={testimonial.logo} 
                                     alt={`${testimonial.company} logo`} 
@@ -581,17 +611,17 @@ const ClientsSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
                                 />
                             </div>
                             <div>
-                                <p className="font-bold text-brand-text-light dark:text-white text-lg sm:text-xl">
+                                <p className="font-bold text-brand-text-light dark:text-white text-base lg:text-lg">
                                     {testimonial.author}
                                 </p>
-                                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+                                <p className="text-sm text-gray-600 dark:text-gray-400">
                                     {testimonial.company}
                                 </p>
                             </div>
                         </div>
                     </motion.div>
                 ))}
-            </div>
+            </Carousel>
         </div>
     </SectionWrapper>
 ));
