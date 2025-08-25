@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, useInView, useMotionValue, AnimatePresence } from 'framer-motion';
 import Lottie from 'react-lottie-player';
 import { Carousel } from './src/components/Carousel';
+import { VerticalVideoCard } from './src/components/VerticalVideoCard';
 import { VideoModal } from './src/components/VideoModal';
 import { getYouTubeThumbnail, isYouTubeUrl } from './src/utils/youtube';
 import aiBrainLottieData from './src/assets/lottie/ai-brain.json';
@@ -373,20 +374,20 @@ const PortfolioSection = React.forwardRef<HTMLElement, {}>((props, ref) => {
                             className="w-full"
                         >
                             {activeTab === 'websites' && (
-                                <Carousel itemsPerView={3} className="w-full">
+                                <Carousel itemsPerView={3} className="w-full" autoScroll={true} autoScrollDelay={5000}>
                                     {MOCK_DATA.portfolio.websites.map(site => (
                                         <a 
                                             href={site.url} 
                                             target="_blank" 
                                             rel="noopener noreferrer" 
                                             key={site.id} 
-                                            className="group bg-gray-50/50 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl overflow-hidden hover:border-brand-purple/50 transition-all p-4 lg:p-6 flex flex-col h-full"
+                                            className="group bg-gray-50/50 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl overflow-hidden hover:border-brand-purple/50 transition-all duration-300 p-4 lg:p-6 flex flex-col h-full"
                                         >
                                             <div className="aspect-video w-full mb-4 rounded-lg overflow-hidden">
                                                 <img 
                                                     src={site.screenshotUrl} 
                                                     alt={site.name} 
-                                                    className="w-full h-full object-cover border border-black/10 dark:border-white/10" 
+                                                    className="w-full h-full object-cover border border-black/10 dark:border-white/10 group-hover:scale-105 transition-transform duration-300" 
                                                 />
                                             </div>
                                             <h3 className="font-bold text-lg lg:text-xl mb-2">{site.name}</h3>
@@ -408,30 +409,13 @@ const PortfolioSection = React.forwardRef<HTMLElement, {}>((props, ref) => {
                             
                             {activeTab === 'video' && (
                                 <>
-                                    <Carousel itemsPerView={3} className="w-full">
+                                    <Carousel itemsPerView={4} className="w-full" autoScroll={true} autoScrollDelay={3000}>
                                         {MOCK_DATA.portfolio.videos.filter(v => v.category === videoCategory).map(video => (
-                                            <div 
-                                                key={video.id} 
+                                            <VerticalVideoCard
+                                                key={video.id}
+                                                video={video}
                                                 onClick={() => setSelectedVideo(video)}
-                                                className="bg-gray-50/50 dark:bg-white/5 p-4 rounded-xl border border-black/10 dark:border-white/10 group cursor-pointer"
-                                            >
-                                                <div className="aspect-video rounded-lg overflow-hidden mb-4 relative">
-                                                    <img 
-                                                        src={video.thumbnail} 
-                                                        alt={video.title} 
-                                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                                    />
-                                                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <VideoIcon className="w-12 h-12 text-white" />
-                                                    </div>
-                                                    {video.isYouTube && (
-                                                        <div className="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded">
-                                                            YouTube
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                <h3 className="font-bold text-lg">{video.title}</h3>
-                                            </div>
+                                            />
                                         ))}
                                     </Carousel>
                                     <VideoModal
@@ -444,17 +428,17 @@ const PortfolioSection = React.forwardRef<HTMLElement, {}>((props, ref) => {
                             )}
                             
                             {activeTab === 'branding' && (
-                                <Carousel itemsPerView={3} className="w-full">
+                                <Carousel itemsPerView={3} className="w-full" autoScroll={true} autoScrollDelay={4500}>
                                     {MOCK_DATA.portfolio.brands.map(brand => (
                                         <div 
                                             key={brand.id} 
-                                            className="bg-gray-50/50 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-6 lg:p-8 flex flex-col justify-center items-center text-center aspect-square"
+                                            className="bg-gray-50/50 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-6 lg:p-8 flex flex-col justify-center items-center text-center aspect-square hover:border-brand-purple/50 transition-all duration-300 group"
                                         >
                                             <div className="h-12 lg:h-16 mb-4 lg:mb-6 flex items-center justify-center">
                                                 <img 
                                                     src={brand.logoUrl} 
                                                     alt={`${brand.name} Logo`} 
-                                                    className="max-h-full max-w-full object-contain"
+                                                    className="max-h-full max-w-full object-contain group-hover:scale-110 transition-transform duration-300"
                                                 />
                                             </div>
                                             <h3 className="font-bold text-lg lg:text-xl mb-2">{brand.name}</h3>
@@ -467,18 +451,18 @@ const PortfolioSection = React.forwardRef<HTMLElement, {}>((props, ref) => {
                             )}
                             
                             {activeTab === 'photography' && (
-                                <Carousel itemsPerView={3} className="w-full">
+                                <Carousel itemsPerView={3} className="w-full" autoScroll={true} autoScrollDelay={4000}>
                                     {MOCK_DATA.portfolio.photos.map(photo => (
                                         <div 
                                             key={photo.id} 
-                                            className="group relative overflow-hidden rounded-lg aspect-[4/5]"
+                                            className="group relative overflow-hidden rounded-xl aspect-[4/5] border border-black/10 dark:border-white/10 hover:border-brand-mint/50 transition-all duration-300"
                                         >
                                             <img 
                                                 src={photo.src} 
                                                 alt={photo.title} 
-                                                className="w-full h-full object-cover rounded-lg" 
+                                                className="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300" 
                                             />
-                                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
                                                 <div>
                                                     <h3 className="text-white font-bold text-lg mb-1">
                                                         {photo.title}
@@ -589,7 +573,7 @@ const ClientsSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
             Nos <span className="text-brand-mint">Clients</span>
         </SectionTitle>
         <div className="w-full">
-            <Carousel itemsPerView={3} className="w-full">
+            <Carousel itemsPerView={3} className="w-full" autoScroll={true} autoScrollDelay={6000}>
                 {MOCK_DATA.testimonials.map((testimonial, index) => (
                     <motion.div 
                         key={testimonial.author}
@@ -597,13 +581,13 @@ const ClientsSection = React.forwardRef<HTMLElement, {}>((props, ref) => (
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: index * 0.2 }}
                         viewport={{ once: true, amount: 0.5 }}
-                        className="bg-gray-50/50 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl p-6 lg:p-8 flex flex-col justify-center backdrop-blur-sm h-full min-h-[300px]"
+                        className="bg-gray-50/50 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl p-6 lg:p-8 flex flex-col justify-center backdrop-blur-sm h-full min-h-[300px] hover:border-brand-mint/50 transition-all duration-300 group"
                     >
                         <p className="text-base lg:text-lg italic mb-6 leading-relaxed flex-grow">
                             "{testimonial.quote}"
                         </p>
                         <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-full bg-white/80 p-2 flex-shrink-0">
+                            <div className="w-12 h-12 rounded-full bg-white/80 p-2 flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
                                 <img 
                                     src={testimonial.logo} 
                                     alt={`${testimonial.company} logo`} 
